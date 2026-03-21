@@ -1,17 +1,25 @@
 {
-  "name": "openclaw",
+  "name": "enterprise-mode-openclaw",
   "version": "2026.3.14",
-  "description": "Multi-channel AI gateway with extensible messaging integrations",
-  "keywords": [],
-  "homepage": "https://github.com/openclaw/openclaw#readme",
+  "description": "Enterprise multi-tenant extension for OpenClaw — adds governance, audit, isolation, collaboration, and reliability layers",
+  "keywords": [
+    "enterprise",
+    "multi-tenant",
+    "ai-gateway",
+    "openclaw",
+    "rbac",
+    "audit",
+    "governance"
+  ],
+  "homepage": "https://github.com/haoyuxiao0223/Enterprise-Mode-openclaw#readme",
   "bugs": {
-    "url": "https://github.com/openclaw/openclaw/issues"
+    "url": "https://github.com/haoyuxiao0223/Enterprise-Mode-openclaw/issues"
   },
   "license": "MIT",
-  "author": "",
+  "author": "haoyuxiao0223",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openclaw/openclaw.git"
+    "url": "git+https://github.com/haoyuxiao0223/Enterprise-Mode-openclaw.git"
   },
   "bin": {
     "openclaw": "openclaw.mjs"

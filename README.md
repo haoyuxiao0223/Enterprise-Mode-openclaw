@@ -109,6 +109,45 @@ pnpm gateway:watch
 
 Note: `pnpm openclaw ...` runs TypeScript directly (via `tsx`). `pnpm build` produces `dist/` for running via Node / the packaged `openclaw` binary.
 
+### Enterprise mode (optional)
+
+OpenClaw includes an enterprise architecture layer (`src/enterprise/`) for multi-tenant, team, and production deployments. It is **disabled by default** and the personal edition works exactly as before with zero external dependencies.
+
+To develop with enterprise features locally (requires Docker):
+
+```bash
+# Start PostgreSQL + Redis via Docker Compose
+cd deploy/docker-compose
+docker compose up -d postgres redis
+
+# Enable enterprise mode in your config
+openclaw config set enterprise.enabled true
+openclaw config set enterprise.kernel.storage.backend postgres
+openclaw config set enterprise.kernel.storage.connectionString "postgres://openclaw:openclaw@localhost:5432/openclaw"
+openclaw config set enterprise.kernel.queue.backend redis
+openclaw config set enterprise.kernel.queue.url "redis://localhost:6379"
+
+# Run the gateway (enterprise REST API available at /api/v1/*)
+pnpm gateway:watch
+```
+
+Enterprise REST API endpoints: `http://localhost:18789/api/v1/health`, `/api/v1/auth/login`, `/api/v1/sessions`, `/api/v1/agents`, etc.
+
+Full Docker deployment (gateway + PG + Redis):
+
+```bash
+cd deploy/docker-compose
+docker compose up -d
+```
+
+Kubernetes deployment via Helm:
+
+```bash
+helm install openclaw deploy/helm/openclaw-enterprise -f deploy/helm/openclaw-enterprise/values.yaml
+```
+
+Enterprise architecture docs: `PRD-openclaw-enterprise-architecture.md`, `tech-desigh.md`, `api-design.md`.
+
 ## Security defaults (DM access)
 
 OpenClaw connects to real messaging surfaces. Treat inbound DMs as **untrusted input**.
