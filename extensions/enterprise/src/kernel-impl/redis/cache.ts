@@ -72,13 +72,7 @@ export class RedisCacheBackend implements CacheBackend {
   }
 
   async setIfAbsent<T>(key: string, value: T, ttlMs: number): Promise<boolean> {
-    const result = await this.client.set(
-      this.k(key),
-      JSON.stringify(value),
-      "PX",
-      ttlMs,
-      "NX",
-    );
+    const result = await this.client.set(this.k(key), JSON.stringify(value), "PX", ttlMs, "NX");
     return result === "OK";
   }
 

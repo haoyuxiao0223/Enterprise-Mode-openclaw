@@ -1,15 +1,15 @@
 {
-  "name": "enterprise-mode-openclaw",
+  "name": "openclaw",
   "version": "2026.3.14",
   "description": "Enterprise multi-tenant extension for OpenClaw — adds governance, audit, isolation, collaboration, and reliability layers",
   "keywords": [
-    "enterprise",
-    "multi-tenant",
     "ai-gateway",
-    "openclaw",
-    "rbac",
     "audit",
-    "governance"
+    "enterprise",
+    "governance",
+    "multi-tenant",
+    "openclaw",
+    "rbac"
   ],
   "homepage": "https://github.com/haoyuxiao0223/Enterprise-Mode-openclaw#readme",
   "bugs": {

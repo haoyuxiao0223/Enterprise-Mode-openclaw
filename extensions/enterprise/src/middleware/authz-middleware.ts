@@ -2,8 +2,8 @@
  * Authorization middleware — checks permissions via PolicyEngine.
  */
 
-import type { TenantContext } from "../kernel/tenant-context.ts";
 import type { PolicyEngine } from "../governance/authorization/policy-engine.ts";
+import type { TenantContext } from "../kernel/tenant-context.ts";
 import type { Middleware } from "./types.ts";
 
 export interface AuthzMiddlewareOptions {

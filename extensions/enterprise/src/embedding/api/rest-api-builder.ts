@@ -8,16 +8,16 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { EnterpriseModules } from "../../registry.ts";
-import { createAuthRoutes } from "./routes/auth.ts";
-import { createTenantRoutes } from "./routes/tenants.ts";
-import { createUserRoutes } from "./routes/users.ts";
-import { createRoleRoutes } from "./routes/roles.ts";
 import { createAgentRoutes } from "./routes/agents.ts";
+import { createApiKeyRoutes } from "./routes/api-keys.ts";
+import { createAuditRoutes } from "./routes/audit.ts";
+import { createAuthRoutes } from "./routes/auth.ts";
+import { createHealthRoutes } from "./routes/health.ts";
+import { createRoleRoutes } from "./routes/roles.ts";
 import { createSessionRoutes } from "./routes/sessions.ts";
 import { createTaskRoutes } from "./routes/tasks.ts";
-import { createAuditRoutes } from "./routes/audit.ts";
-import { createHealthRoutes } from "./routes/health.ts";
-import { createApiKeyRoutes } from "./routes/api-keys.ts";
+import { createTenantRoutes } from "./routes/tenants.ts";
+import { createUserRoutes } from "./routes/users.ts";
 
 export function buildRestApi(modules: EnterpriseModules): Hono {
   const api = new Hono();

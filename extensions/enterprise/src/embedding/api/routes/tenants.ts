@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import type { EnterpriseModules } from "../../../registry.ts";
 import { createDefaultTenantContext } from "../../../kernel/tenant-context.ts";
+import type { EnterpriseModules } from "../../../registry.ts";
 
 export function createTenantRoutes(modules: EnterpriseModules): Hono {
   const app = new Hono();

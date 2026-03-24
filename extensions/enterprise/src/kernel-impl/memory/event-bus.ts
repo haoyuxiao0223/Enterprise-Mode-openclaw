@@ -5,7 +5,12 @@
  * Uses glob-style pattern matching for subscriptions.
  */
 
-import type { EventBus, PlatformEvent, EventHandler, EventSubscription } from "../../kernel/event-bus.ts";
+import type {
+  EventBus,
+  PlatformEvent,
+  EventHandler,
+  EventSubscription,
+} from "../../kernel/event-bus.ts";
 
 interface Subscriber {
   pattern: string;
@@ -66,8 +71,6 @@ export class InProcessEventBus implements EventBus {
 /** Convert a simple glob pattern (with `*`) to a RegExp. */
 function globToRegex(pattern: string): RegExp {
   if (pattern === "*") return /^.+$/;
-  const escaped = pattern
-    .replace(/[.+^${}()|[\]\\]/g, "\\$&")
-    .replace(/\*/g, "[^.]*");
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]*");
   return new RegExp(`^${escaped}$`);
 }

@@ -3,10 +3,10 @@
  * and exposes start/stop lifecycle for the OpenClaw plugin service contract.
  */
 
-import type { EnterpriseConfig } from "./src/kernel/config.ts";
-import type { EnterpriseModules } from "./src/registry.ts";
 import { bootstrapKernel, shutdownKernel } from "./src/kernel/bootstrap.ts";
+import type { EnterpriseConfig } from "./src/kernel/config.ts";
 import { resolveDefaultEnterpriseConfig } from "./src/kernel/config.ts";
+import type { EnterpriseModules } from "./src/registry.ts";
 
 let activeModules: EnterpriseModules | null = null;
 
@@ -29,15 +29,14 @@ export async function bootstrapEnterprise(
 
   const kernel = await bootstrapKernel(config);
 
-  const [governance, audit, collaboration, embedding, isolation, reliability] =
-    await Promise.all([
-      resolveGovernance(config, kernel),
-      resolveAudit(config, kernel),
-      resolveCollaboration(config, kernel),
-      resolveEmbedding(config),
-      resolveIsolation(config),
-      resolveReliability(config),
-    ]);
+  const [governance, audit, collaboration, embedding, isolation, reliability] = await Promise.all([
+    resolveGovernance(config, kernel),
+    resolveAudit(config, kernel),
+    resolveCollaboration(config, kernel),
+    resolveEmbedding(config),
+    resolveIsolation(config),
+    resolveReliability(config),
+  ]);
 
   activeModules = {
     kernel,
@@ -73,12 +72,9 @@ async function resolveGovernance(
 ): Promise<EnterpriseModules["governance"]> {
   if (!config.governance) return null;
 
-  const { TokenIdentityProvider } = await import(
-    "./src/governance/identity/impl/token-provider.ts"
-  );
-  const { ScopePolicyEngine } = await import(
-    "./src/governance/authorization/impl/scope-policy.ts"
-  );
+  const { TokenIdentityProvider } =
+    await import("./src/governance/identity/impl/token-provider.ts");
+  const { ScopePolicyEngine } = await import("./src/governance/authorization/impl/scope-policy.ts");
 
   return {
     identityProvider: new TokenIdentityProvider(kernel.secret),
@@ -92,13 +88,9 @@ async function resolveAudit(
 ): Promise<EnterpriseModules["audit"]> {
   if (!config.audit?.sinks?.length) return null;
 
-  const { MemoryAuditPipeline } = await import(
-    "./src/audit/impl/memory-pipeline.ts"
-  );
+  const { MemoryAuditPipeline } = await import("./src/audit/impl/memory-pipeline.ts");
   const { LogAuditSink } = await import("./src/audit/impl/log-sink.ts");
-  const { StorageAuditSink } = await import(
-    "./src/audit/impl/storage-sink.ts"
-  );
+  const { StorageAuditSink } = await import("./src/audit/impl/storage-sink.ts");
 
   const sinks = config.audit.sinks.map((s) => {
     switch (s.type) {
@@ -136,9 +128,7 @@ async function resolveReliability(
 ): Promise<EnterpriseModules["reliability"]> {
   if (!config.reliability?.metrics) return null;
 
-  const { HealthCheckerImpl } = await import(
-    "./src/reliability/health/health-checker.ts"
-  );
+  const { HealthCheckerImpl } = await import("./src/reliability/health/health-checker.ts");
 
   return {
     checkpointManager: undefined,

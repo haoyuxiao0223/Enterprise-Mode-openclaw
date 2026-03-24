@@ -11,12 +11,12 @@
 
 ### 基础信息
 
-| 项目 | 说明 |
-|------|------|
-| **基础路径** | `/api/v1` |
-| **认证方式** | `Authorization: Bearer <token>`（支持 OIDC / Token / API Key） |
-| **租户标识** | 通过认证中间件自动注入 `TenantContext`，无需显式传递 |
-| **内容类型** | `Content-Type: application/json` |
+| 项目           | 说明                                                                              |
+| -------------- | --------------------------------------------------------------------------------- |
+| **基础路径**   | `/api/v1`                                                                         |
+| **认证方式**   | `Authorization: Bearer <token>`（支持 OIDC / Token / API Key）                    |
+| **租户标识**   | 通过认证中间件自动注入 `TenantContext`，无需显式传递                              |
+| **内容类型**   | `Content-Type: application/json`                                                  |
 | **通用响应头** | `X-Request-Id`, `X-RateLimit-Remaining`, `X-RateLimit-Limit`, `X-RateLimit-Reset` |
 
 ### 中间件链
@@ -31,16 +31,16 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 本文档共覆盖 **25 个资源域、约 100 个端点**，按 PRD 六维架构模块组织：
 
-| 模块 | 资源域 | 端点数 |
-|------|--------|--------|
-| 认证与身份 | Auth | 5 |
-| 内核层 | Tenants, KV Store | 10 |
-| 可治理 (Governance) | Users, Roles, Permissions, Groups, Policies, Content Filters, Quotas, AuthZ | 40 |
-| 可审计 (Audit) | Audit Events, Audit Metrics | 3 |
-| 可协作 (Collaboration) | Agents, Sessions, Tasks, Workflows, Handoffs, Knowledge | 30 |
-| 可嵌入 (Embedding) | API Keys, Rate Limits, Messages | 10 |
-| 可隔离 (Isolation) | Runtime Instances | 7 |
-| 可靠性 (Reliability) | Queues, Checkpoints, Circuit Breakers, Health, Metrics, Events | 15 |
+| 模块                   | 资源域                                                                      | 端点数 |
+| ---------------------- | --------------------------------------------------------------------------- | ------ |
+| 认证与身份             | Auth                                                                        | 5      |
+| 内核层                 | Tenants, KV Store                                                           | 10     |
+| 可治理 (Governance)    | Users, Roles, Permissions, Groups, Policies, Content Filters, Quotas, AuthZ | 40     |
+| 可审计 (Audit)         | Audit Events, Audit Metrics                                                 | 3      |
+| 可协作 (Collaboration) | Agents, Sessions, Tasks, Workflows, Handoffs, Knowledge                     | 30     |
+| 可嵌入 (Embedding)     | API Keys, Rate Limits, Messages                                             | 10     |
+| 可隔离 (Isolation)     | Runtime Instances                                                           | 7      |
+| 可靠性 (Reliability)   | Queues, Checkpoints, Circuit Breakers, Health, Metrics, Events              | 15     |
 
 ---
 
@@ -48,13 +48,13 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| POST | `/api/v1/auth/login` | 用户登录（Token/Password 模式） | 公开 |
-| POST | `/api/v1/auth/logout` | 用户登出，吊销当前令牌 | 已认证 |
-| POST | `/api/v1/auth/refresh` | 刷新访问令牌 | 已认证 |
-| GET | `/api/v1/auth/me` | 获取当前用户身份信息 | 已认证 |
-| POST | `/api/v1/auth/oidc/callback` | OIDC 认证回调 | 公开 |
+| HTTP 方法 | URL 路径                     | 功能描述                        | 权限要求 |
+| --------- | ---------------------------- | ------------------------------- | -------- |
+| POST      | `/api/v1/auth/login`         | 用户登录（Token/Password 模式） | 公开     |
+| POST      | `/api/v1/auth/logout`        | 用户登出，吊销当前令牌          | 已认证   |
+| POST      | `/api/v1/auth/refresh`       | 刷新访问令牌                    | 已认证   |
+| GET       | `/api/v1/auth/me`            | 获取当前用户身份信息            | 已认证   |
+| POST      | `/api/v1/auth/oidc/callback` | OIDC 认证回调                   | 公开     |
 
 ### POST `/api/v1/auth/login`
 
@@ -71,12 +71,12 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `grant_type` | string | 是 | `"password"` / `"token"` / `"client_credentials"` |
-| `username` | string | 条件 | `grant_type=password` 时必填 |
-| `password` | string | 条件 | `grant_type=password` 时必填 |
-| `token` | string | 条件 | `grant_type=token` 时必填 |
+| 字段         | 类型   | 必填 | 说明                                              |
+| ------------ | ------ | ---- | ------------------------------------------------- |
+| `grant_type` | string | 是   | `"password"` / `"token"` / `"client_credentials"` |
+| `username`   | string | 条件 | `grant_type=password` 时必填                      |
+| `password`   | string | 条件 | `grant_type=password` 时必填                      |
+| `token`      | string | 条件 | `grant_type=token` 时必填                         |
 
 **Response Body (200)**：
 
@@ -152,12 +152,12 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/tenants/current` | 获取当前租户信息 | 已认证 |
-| PUT | `/api/v1/tenants/current` | 更新当前租户信息 | admin |
-| POST | `/api/v1/tenants` | 创建新租户 | system |
-| GET | `/api/v1/tenants/:tenantId` | 获取指定租户信息 | system |
+| HTTP 方法 | URL 路径                    | 功能描述         | 权限要求 |
+| --------- | --------------------------- | ---------------- | -------- |
+| GET       | `/api/v1/tenants/current`   | 获取当前租户信息 | 已认证   |
+| PUT       | `/api/v1/tenants/current`   | 更新当前租户信息 | admin    |
+| POST      | `/api/v1/tenants`           | 创建新租户       | system   |
+| GET       | `/api/v1/tenants/:tenantId` | 获取指定租户信息 | system   |
 
 ### GET `/api/v1/tenants/current`
 
@@ -196,10 +196,10 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `display_name` | string | 否 | 租户显示名称 |
-| `settings` | object | 否 | 租户级配置（JSONB） |
+| 字段           | 类型   | 必填 | 说明                |
+| -------------- | ------ | ---- | ------------------- |
+| `display_name` | string | 否   | 租户显示名称        |
+| `settings`     | object | 否   | 租户级配置（JSONB） |
 
 **Response Body (200)**：
 
@@ -209,7 +209,7 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
   "name": "acme-corp",
   "display_name": "ACME Corp International",
   "status": "active",
-  "settings": { "..." : "..." },
+  "settings": { "...": "..." },
   "updated_at": "2026-03-21T10:00:00Z"
 }
 ```
@@ -248,17 +248,17 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/users` | 分页列出租户内用户 | 已认证 |
-| POST | `/api/v1/users` | 创建用户 | admin |
-| GET | `/api/v1/users/:userId` | 获取用户详情 | 已认证 |
-| PUT | `/api/v1/users/:userId` | 更新用户信息 | 自己/admin |
-| DELETE | `/api/v1/users/:userId` | 删除用户（软删除 → inactive） | admin |
-| GET | `/api/v1/users/:userId/roles` | 获取用户的角色列表 | 已认证 |
-| POST | `/api/v1/users/:userId/roles` | 为用户分配角色 | admin |
-| DELETE | `/api/v1/users/:userId/roles/:roleId` | 撤销用户的角色 | admin |
-| GET | `/api/v1/users/:userId/groups` | 获取用户所属的用户组 | 已认证 |
+| HTTP 方法 | URL 路径                              | 功能描述                      | 权限要求   |
+| --------- | ------------------------------------- | ----------------------------- | ---------- |
+| GET       | `/api/v1/users`                       | 分页列出租户内用户            | 已认证     |
+| POST      | `/api/v1/users`                       | 创建用户                      | admin      |
+| GET       | `/api/v1/users/:userId`               | 获取用户详情                  | 已认证     |
+| PUT       | `/api/v1/users/:userId`               | 更新用户信息                  | 自己/admin |
+| DELETE    | `/api/v1/users/:userId`               | 删除用户（软删除 → inactive） | admin      |
+| GET       | `/api/v1/users/:userId/roles`         | 获取用户的角色列表            | 已认证     |
+| POST      | `/api/v1/users/:userId/roles`         | 为用户分配角色                | admin      |
+| DELETE    | `/api/v1/users/:userId/roles/:roleId` | 撤销用户的角色                | admin      |
+| GET       | `/api/v1/users/:userId/groups`        | 获取用户所属的用户组          | 已认证     |
 
 ### GET `/api/v1/users`
 
@@ -266,13 +266,13 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `offset` | integer | 0 | 跳过前 N 条 |
-| `limit` | integer | 20 | 每页数量（最大 100） |
-| `status` | string | — | 按状态过滤：`active` / `inactive` / `locked` |
-| `identity_source` | string | — | 按身份来源过滤：`local` / `oidc` / `saml` / `ldap` / `token` |
-| `q` | string | — | 模糊搜索（email / display_name） |
+| 参数              | 类型    | 默认值 | 说明                                                         |
+| ----------------- | ------- | ------ | ------------------------------------------------------------ |
+| `offset`          | integer | 0      | 跳过前 N 条                                                  |
+| `limit`           | integer | 20     | 每页数量（最大 100）                                         |
+| `status`          | string  | —      | 按状态过滤：`active` / `inactive` / `locked`                 |
+| `identity_source` | string  | —      | 按身份来源过滤：`local` / `oidc` / `saml` / `ldap` / `token` |
+| `q`               | string  | —      | 模糊搜索（email / display_name）                             |
 
 **Response Body (200)**：
 
@@ -314,14 +314,14 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `id` | string | 是 | 用户唯一标识 |
-| `email` | string | 否 | 邮箱地址 |
-| `display_name` | string | 否 | 显示名称 |
-| `identity_source` | string | 否 | 身份来源，默认 `"local"` |
-| `external_id` | string | 否 | 外部 IdP 中的用户 ID |
-| `metadata` | object | 否 | 自定义元数据 |
+| 字段              | 类型   | 必填 | 说明                     |
+| ----------------- | ------ | ---- | ------------------------ |
+| `id`              | string | 是   | 用户唯一标识             |
+| `email`           | string | 否   | 邮箱地址                 |
+| `display_name`    | string | 否   | 显示名称                 |
+| `identity_source` | string | 否   | 身份来源，默认 `"local"` |
+| `external_id`     | string | 否   | 外部 IdP 中的用户 ID     |
+| `metadata`        | object | 否   | 自定义元数据             |
 
 **Response Body (201)**：
 
@@ -379,10 +379,10 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `role_id` | string | 是 | 角色 ID |
-| `expires_at` | string (ISO 8601) | 否 | 角色过期时间，NULL 表示永久 |
+| 字段         | 类型              | 必填 | 说明                        |
+| ------------ | ----------------- | ---- | --------------------------- |
+| `role_id`    | string            | 是   | 角色 ID                     |
+| `expires_at` | string (ISO 8601) | 否   | 角色过期时间，NULL 表示永久 |
 
 **Response Body (201)**：
 
@@ -402,18 +402,18 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/roles` | 列出租户内所有角色 | 已认证 |
-| POST | `/api/v1/roles` | 创建角色 | admin |
-| GET | `/api/v1/roles/:roleId` | 获取角色详情 | 已认证 |
-| PUT | `/api/v1/roles/:roleId` | 更新角色（系统角色不可修改） | admin |
-| DELETE | `/api/v1/roles/:roleId` | 删除角色（系统角色不可删除） | admin |
-| GET | `/api/v1/roles/:roleId/permissions` | 获取角色的权限列表 | 已认证 |
-| POST | `/api/v1/roles/:roleId/permissions` | 为角色添加权限 | admin |
-| DELETE | `/api/v1/roles/:roleId/permissions/:permissionId` | 移除角色的权限 | admin |
-| GET | `/api/v1/permissions` | 列出所有权限定义 | 已认证 |
-| POST | `/api/v1/permissions` | 创建权限定义 | admin |
+| HTTP 方法 | URL 路径                                          | 功能描述                     | 权限要求 |
+| --------- | ------------------------------------------------- | ---------------------------- | -------- |
+| GET       | `/api/v1/roles`                                   | 列出租户内所有角色           | 已认证   |
+| POST      | `/api/v1/roles`                                   | 创建角色                     | admin    |
+| GET       | `/api/v1/roles/:roleId`                           | 获取角色详情                 | 已认证   |
+| PUT       | `/api/v1/roles/:roleId`                           | 更新角色（系统角色不可修改） | admin    |
+| DELETE    | `/api/v1/roles/:roleId`                           | 删除角色（系统角色不可删除） | admin    |
+| GET       | `/api/v1/roles/:roleId/permissions`               | 获取角色的权限列表           | 已认证   |
+| POST      | `/api/v1/roles/:roleId/permissions`               | 为角色添加权限               | admin    |
+| DELETE    | `/api/v1/roles/:roleId/permissions/:permissionId` | 移除角色的权限               | admin    |
+| GET       | `/api/v1/permissions`                             | 列出所有权限定义             | 已认证   |
+| POST      | `/api/v1/permissions`                             | 创建权限定义                 | admin    |
 
 ### POST `/api/v1/roles`
 
@@ -429,11 +429,11 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `id` | string | 是 | 角色唯一标识 |
-| `name` | string | 是 | 角色显示名称 |
-| `description` | string | 否 | 角色描述 |
+| 字段          | 类型   | 必填 | 说明         |
+| ------------- | ------ | ---- | ------------ |
+| `id`          | string | 是   | 角色唯一标识 |
+| `name`        | string | 是   | 角色显示名称 |
+| `description` | string | 否   | 角色描述     |
 
 **Response Body (201)**：
 
@@ -508,16 +508,16 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/groups` | 列出租户内用户组 | 已认证 |
-| POST | `/api/v1/groups` | 创建用户组 | admin |
-| GET | `/api/v1/groups/:groupId` | 获取用户组详情 | 已认证 |
-| PUT | `/api/v1/groups/:groupId` | 更新用户组 | admin |
-| DELETE | `/api/v1/groups/:groupId` | 删除用户组 | admin |
-| GET | `/api/v1/groups/:groupId/members` | 列出用户组成员 | 已认证 |
-| POST | `/api/v1/groups/:groupId/members` | 添加成员到用户组 | admin |
-| DELETE | `/api/v1/groups/:groupId/members/:userId` | 从用户组移除成员 | admin |
+| HTTP 方法 | URL 路径                                  | 功能描述         | 权限要求 |
+| --------- | ----------------------------------------- | ---------------- | -------- |
+| GET       | `/api/v1/groups`                          | 列出租户内用户组 | 已认证   |
+| POST      | `/api/v1/groups`                          | 创建用户组       | admin    |
+| GET       | `/api/v1/groups/:groupId`                 | 获取用户组详情   | 已认证   |
+| PUT       | `/api/v1/groups/:groupId`                 | 更新用户组       | admin    |
+| DELETE    | `/api/v1/groups/:groupId`                 | 删除用户组       | admin    |
+| GET       | `/api/v1/groups/:groupId/members`         | 列出用户组成员   | 已认证   |
+| POST      | `/api/v1/groups/:groupId/members`         | 添加成员到用户组 | admin    |
+| DELETE    | `/api/v1/groups/:groupId/members/:userId` | 从用户组移除成员 | admin    |
 
 ### POST `/api/v1/groups`
 
@@ -534,12 +534,12 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `id` | string | 是 | 用户组唯一标识 |
-| `name` | string | 是 | 用户组名称 |
-| `description` | string | 否 | 用户组描述 |
-| `parent_group_id` | string | 否 | 父用户组 ID，NULL 表示顶级组 |
+| 字段              | 类型   | 必填 | 说明                         |
+| ----------------- | ------ | ---- | ---------------------------- |
+| `id`              | string | 是   | 用户组唯一标识               |
+| `name`            | string | 是   | 用户组名称                   |
+| `description`     | string | 否   | 用户组描述                   |
+| `parent_group_id` | string | 否   | 父用户组 ID，NULL 表示顶级组 |
 
 **Response Body (201)**：
 
@@ -583,19 +583,19 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/policies` | 列出所有策略定义 | 已认证 |
-| POST | `/api/v1/policies` | 创建策略定义（含规则） | admin |
-| GET | `/api/v1/policies/:policyId` | 获取策略详情（含规则列表） | 已认证 |
-| PUT | `/api/v1/policies/:policyId` | 更新策略定义 | admin |
-| DELETE | `/api/v1/policies/:policyId` | 删除策略定义（级联删除规则） | admin |
-| POST | `/api/v1/policies/:policyId/rules` | 为策略添加规则 | admin |
-| PUT | `/api/v1/policies/:policyId/rules/:ruleId` | 更新策略规则 | admin |
-| DELETE | `/api/v1/policies/:policyId/rules/:ruleId` | 删除策略规则 | admin |
-| POST | `/api/v1/policies/reload` | 热加载所有活跃策略到引擎 | admin |
-| POST | `/api/v1/authz/check` | 检查授权决策（单条） | 已认证 |
-| POST | `/api/v1/authz/batch-check` | 批量检查授权决策 | 已认证 |
+| HTTP 方法 | URL 路径                                   | 功能描述                     | 权限要求 |
+| --------- | ------------------------------------------ | ---------------------------- | -------- |
+| GET       | `/api/v1/policies`                         | 列出所有策略定义             | 已认证   |
+| POST      | `/api/v1/policies`                         | 创建策略定义（含规则）       | admin    |
+| GET       | `/api/v1/policies/:policyId`               | 获取策略详情（含规则列表）   | 已认证   |
+| PUT       | `/api/v1/policies/:policyId`               | 更新策略定义                 | admin    |
+| DELETE    | `/api/v1/policies/:policyId`               | 删除策略定义（级联删除规则） | admin    |
+| POST      | `/api/v1/policies/:policyId/rules`         | 为策略添加规则               | admin    |
+| PUT       | `/api/v1/policies/:policyId/rules/:ruleId` | 更新策略规则                 | admin    |
+| DELETE    | `/api/v1/policies/:policyId/rules/:ruleId` | 删除策略规则                 | admin    |
+| POST      | `/api/v1/policies/reload`                  | 热加载所有活跃策略到引擎     | admin    |
+| POST      | `/api/v1/authz/check`                      | 检查授权决策（单条）         | 已认证   |
+| POST      | `/api/v1/authz/batch-check`                | 批量检查授权决策             | 已认证   |
 
 ### POST `/api/v1/policies`
 
@@ -629,18 +629,18 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `id` | string | 是 | 策略唯一标识 |
-| `name` | string | 是 | 策略名称 |
-| `description` | string | 否 | 策略描述 |
-| `rules` | array | 否 | 策略规则列表，可在创建后单独添加 |
-| `rules[].effect` | string | 是 | `"allow"` / `"deny"` |
-| `rules[].subjects` | string[] | 是 | 匹配的角色/用户组名 |
-| `rules[].actions` | string[] | 是 | 匹配的操作（支持 `*` 通配） |
-| `rules[].resources` | string[] | 是 | 匹配的资源类型 |
-| `rules[].conditions` | object | 否 | ABAC 条件表达式（JSONB） |
-| `rules[].priority` | integer | 否 | 规则优先级，默认 0 |
+| 字段                 | 类型     | 必填 | 说明                             |
+| -------------------- | -------- | ---- | -------------------------------- |
+| `id`                 | string   | 是   | 策略唯一标识                     |
+| `name`               | string   | 是   | 策略名称                         |
+| `description`        | string   | 否   | 策略描述                         |
+| `rules`              | array    | 否   | 策略规则列表，可在创建后单独添加 |
+| `rules[].effect`     | string   | 是   | `"allow"` / `"deny"`             |
+| `rules[].subjects`   | string[] | 是   | 匹配的角色/用户组名              |
+| `rules[].actions`    | string[] | 是   | 匹配的操作（支持 `*` 通配）      |
+| `rules[].resources`  | string[] | 是   | 匹配的资源类型                   |
+| `rules[].conditions` | object   | 否   | ABAC 条件表达式（JSONB）         |
+| `rules[].priority`   | integer  | 否   | 规则优先级，默认 0               |
 
 **Response Body (201)**：
 
@@ -699,12 +699,12 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `action` | string | 是 | 操作标识（如 `"sessions.send"`） |
-| `resource.type` | string | 是 | 资源类型 |
-| `resource.id` | string | 否 | 资源 ID |
-| `context` | object | 否 | 环境上下文（IP、时间、设备等） |
+| 字段            | 类型   | 必填 | 说明                             |
+| --------------- | ------ | ---- | -------------------------------- |
+| `action`        | string | 是   | 操作标识（如 `"sessions.send"`） |
+| `resource.type` | string | 是   | 资源类型                         |
+| `resource.id`   | string | 否   | 资源 ID                          |
+| `context`       | object | 否   | 环境上下文（IP、时间、设备等）   |
 
 **Response Body (200)**：
 
@@ -712,9 +712,7 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 {
   "allowed": true,
   "reason": null,
-  "obligations": [
-    { "type": "audit", "params": {} }
-  ]
+  "obligations": [{ "type": "audit", "params": {} }]
 }
 ```
 
@@ -752,14 +750,14 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/content-filters` | 列出内容过滤规则 | 已认证 |
-| POST | `/api/v1/content-filters` | 创建内容过滤规则 | admin |
-| GET | `/api/v1/content-filters/:filterId` | 获取过滤规则详情 | 已认证 |
-| PUT | `/api/v1/content-filters/:filterId` | 更新过滤规则 | admin |
-| DELETE | `/api/v1/content-filters/:filterId` | 删除过滤规则 | admin |
-| POST | `/api/v1/content-filters/test` | 测试内容过滤规则（不持久化） | admin |
+| HTTP 方法 | URL 路径                            | 功能描述                     | 权限要求 |
+| --------- | ----------------------------------- | ---------------------------- | -------- |
+| GET       | `/api/v1/content-filters`           | 列出内容过滤规则             | 已认证   |
+| POST      | `/api/v1/content-filters`           | 创建内容过滤规则             | admin    |
+| GET       | `/api/v1/content-filters/:filterId` | 获取过滤规则详情             | 已认证   |
+| PUT       | `/api/v1/content-filters/:filterId` | 更新过滤规则                 | admin    |
+| DELETE    | `/api/v1/content-filters/:filterId` | 删除过滤规则                 | admin    |
+| POST      | `/api/v1/content-filters/test`      | 测试内容过滤规则（不持久化） | admin    |
 
 ### POST `/api/v1/content-filters`
 
@@ -781,17 +779,17 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `name` | string | 是 | 规则名称 |
-| `direction` | string | 是 | `"inbound"` / `"outbound"` / `"both"` |
-| `filter_type` | string | 是 | 过滤器类型标识 |
-| `pattern` | string | 否 | 匹配模式（正则等） |
-| `severity` | string | 否 | `"info"` / `"warning"` / `"critical"`，默认 `"warning"` |
-| `action_on_match` | string | 否 | `"allow"` / `"redact"` / `"block"` / `"review"`，默认 `"redact"` |
-| `is_active` | boolean | 否 | 是否启用，默认 `true` |
-| `priority` | integer | 否 | 优先级（越大越优先），默认 0 |
-| `config` | object | 否 | 过滤器附加配置 |
+| 字段              | 类型    | 必填 | 说明                                                             |
+| ----------------- | ------- | ---- | ---------------------------------------------------------------- |
+| `name`            | string  | 是   | 规则名称                                                         |
+| `direction`       | string  | 是   | `"inbound"` / `"outbound"` / `"both"`                            |
+| `filter_type`     | string  | 是   | 过滤器类型标识                                                   |
+| `pattern`         | string  | 否   | 匹配模式（正则等）                                               |
+| `severity`        | string  | 否   | `"info"` / `"warning"` / `"critical"`，默认 `"warning"`          |
+| `action_on_match` | string  | 否   | `"allow"` / `"redact"` / `"block"` / `"review"`，默认 `"redact"` |
+| `is_active`       | boolean | 否   | 是否启用，默认 `true`                                            |
+| `priority`        | integer | 否   | 优先级（越大越优先），默认 0                                     |
+| `config`          | object  | 否   | 过滤器附加配置                                                   |
 
 **Response Body (201)**：
 
@@ -852,14 +850,14 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/quotas` | 列出配额配置 | 已认证 |
-| POST | `/api/v1/quotas` | 创建配额配置 | admin |
-| PUT | `/api/v1/quotas/:quotaId` | 更新配额配置 | admin |
-| DELETE | `/api/v1/quotas/:quotaId` | 删除配额配置 | admin |
-| GET | `/api/v1/quotas/usage` | 查询当前用户/租户的配额使用量 | 已认证 |
-| GET | `/api/v1/quotas/usage/:userId` | 查询指定用户的配额使用量 | admin |
+| HTTP 方法 | URL 路径                       | 功能描述                      | 权限要求 |
+| --------- | ------------------------------ | ----------------------------- | -------- |
+| GET       | `/api/v1/quotas`               | 列出配额配置                  | 已认证   |
+| POST      | `/api/v1/quotas`               | 创建配额配置                  | admin    |
+| PUT       | `/api/v1/quotas/:quotaId`      | 更新配额配置                  | admin    |
+| DELETE    | `/api/v1/quotas/:quotaId`      | 删除配额配置                  | admin    |
+| GET       | `/api/v1/quotas/usage`         | 查询当前用户/租户的配额使用量 | 已认证   |
+| GET       | `/api/v1/quotas/usage/:userId` | 查询指定用户的配额使用量      | admin    |
 
 ### POST `/api/v1/quotas`
 
@@ -878,14 +876,14 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `scope_type` | string | 是 | `"tenant"` / `"user"` / `"role"` / `"agent"` |
-| `scope_id` | string | 否 | 具体作用对象 ID（NULL 表示该类型下所有对象） |
-| `resource_type` | string | 是 | 资源类型标识（如 `"llm_tokens_per_day"`） |
-| `max_value` | integer | 是 | 配额上限值 |
-| `window_seconds` | integer | 是 | 时间窗口（秒）。86400 = 日配额 |
-| `is_active` | boolean | 否 | 是否启用，默认 `true` |
+| 字段             | 类型    | 必填 | 说明                                         |
+| ---------------- | ------- | ---- | -------------------------------------------- |
+| `scope_type`     | string  | 是   | `"tenant"` / `"user"` / `"role"` / `"agent"` |
+| `scope_id`       | string  | 否   | 具体作用对象 ID（NULL 表示该类型下所有对象） |
+| `resource_type`  | string  | 是   | 资源类型标识（如 `"llm_tokens_per_day"`）    |
+| `max_value`      | integer | 是   | 配额上限值                                   |
+| `window_seconds` | integer | 是   | 时间窗口（秒）。86400 = 日配额               |
+| `is_active`      | boolean | 否   | 是否启用，默认 `true`                        |
 
 **Response Body (201)**：
 
@@ -941,14 +939,14 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/agents` | 分页列出租户内 Agent | 已认证 |
-| POST | `/api/v1/agents` | 创建 Agent | admin/editor |
-| GET | `/api/v1/agents/:agentId` | 获取 Agent 详情 | 已认证 |
-| PUT | `/api/v1/agents/:agentId` | 更新 Agent 配置 | 创建者/admin |
-| DELETE | `/api/v1/agents/:agentId` | 归档 Agent（软删除 → archived） | admin |
-| GET | `/api/v1/agents/:agentId/status` | 获取 Agent 运行状态 | 已认证 |
+| HTTP 方法 | URL 路径                         | 功能描述                        | 权限要求     |
+| --------- | -------------------------------- | ------------------------------- | ------------ |
+| GET       | `/api/v1/agents`                 | 分页列出租户内 Agent            | 已认证       |
+| POST      | `/api/v1/agents`                 | 创建 Agent                      | admin/editor |
+| GET       | `/api/v1/agents/:agentId`        | 获取 Agent 详情                 | 已认证       |
+| PUT       | `/api/v1/agents/:agentId`        | 更新 Agent 配置                 | 创建者/admin |
+| DELETE    | `/api/v1/agents/:agentId`        | 归档 Agent（软删除 → archived） | admin        |
+| GET       | `/api/v1/agents/:agentId/status` | 获取 Agent 运行状态             | 已认证       |
 
 ### GET `/api/v1/agents`
 
@@ -956,11 +954,11 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `offset` | integer | 0 | 跳过前 N 条 |
-| `limit` | integer | 20 | 每页数量 |
-| `status` | string | — | 按状态过滤：`active` / `inactive` / `archived` |
+| 参数     | 类型    | 默认值 | 说明                                           |
+| -------- | ------- | ------ | ---------------------------------------------- |
+| `offset` | integer | 0      | 跳过前 N 条                                    |
+| `limit`  | integer | 20     | 每页数量                                       |
+| `status` | string  | —      | 按状态过滤：`active` / `inactive` / `archived` |
 
 **Response Body (200)**：
 
@@ -1008,15 +1006,15 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `id` | string | 是 | Agent 唯一标识 |
-| `name` | string | 是 | Agent 名称 |
-| `description` | string | 否 | Agent 描述 |
-| `model` | string | 否 | 使用的 LLM 模型标识 |
-| `system_prompt` | string | 否 | 系统提示词 |
-| `tools` | array | 否 | Agent 可用工具列表 |
-| `config` | object | 否 | Agent 运行时配置 |
+| 字段            | 类型   | 必填 | 说明                |
+| --------------- | ------ | ---- | ------------------- |
+| `id`            | string | 是   | Agent 唯一标识      |
+| `name`          | string | 是   | Agent 名称          |
+| `description`   | string | 否   | Agent 描述          |
+| `model`         | string | 否   | 使用的 LLM 模型标识 |
+| `system_prompt` | string | 否   | 系统提示词          |
+| `tools`         | array  | 否   | Agent 可用工具列表  |
+| `config`        | object | 否   | Agent 运行时配置    |
 
 **Response Body (201)**：
 
@@ -1063,16 +1061,16 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/sessions` | 分页列出当前用户的会话 | 已认证 |
-| POST | `/api/v1/sessions` | 创建新会话 | admin/editor |
-| GET | `/api/v1/sessions/:sessionKey` | 获取会话详情 | 自己/admin |
-| PUT | `/api/v1/sessions/:sessionKey` | 更新会话元数据 | 自己/admin |
-| DELETE | `/api/v1/sessions/:sessionKey` | 归档会话（软删除） | admin |
-| POST | `/api/v1/sessions/:sessionKey/send` | 向会话发送消息（调用 Agent） | 自己/admin |
-| GET | `/api/v1/sessions/:sessionKey/history` | 获取会话消息历史 | 自己/admin |
-| POST | `/api/v1/sessions/:sessionKey/abort` | 中止当前正在进行的请求 | 自己/admin |
+| HTTP 方法 | URL 路径                               | 功能描述                     | 权限要求     |
+| --------- | -------------------------------------- | ---------------------------- | ------------ |
+| GET       | `/api/v1/sessions`                     | 分页列出当前用户的会话       | 已认证       |
+| POST      | `/api/v1/sessions`                     | 创建新会话                   | admin/editor |
+| GET       | `/api/v1/sessions/:sessionKey`         | 获取会话详情                 | 自己/admin   |
+| PUT       | `/api/v1/sessions/:sessionKey`         | 更新会话元数据               | 自己/admin   |
+| DELETE    | `/api/v1/sessions/:sessionKey`         | 归档会话（软删除）           | admin        |
+| POST      | `/api/v1/sessions/:sessionKey/send`    | 向会话发送消息（调用 Agent） | 自己/admin   |
+| GET       | `/api/v1/sessions/:sessionKey/history` | 获取会话消息历史             | 自己/admin   |
+| POST      | `/api/v1/sessions/:sessionKey/abort`   | 中止当前正在进行的请求       | 自己/admin   |
 
 ### POST `/api/v1/sessions`
 
@@ -1089,12 +1087,12 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `session_key` | string | 是 | 会话唯一键（租户内唯一） |
-| `agent_id` | string | 是 | 关联的 Agent ID |
-| `title` | string | 否 | 会话标题 |
-| `metadata` | object | 否 | 自定义元数据 |
+| 字段          | 类型   | 必填 | 说明                     |
+| ------------- | ------ | ---- | ------------------------ |
+| `session_key` | string | 是   | 会话唯一键（租户内唯一） |
+| `agent_id`    | string | 是   | 关联的 Agent ID          |
+| `title`       | string | 否   | 会话标题                 |
+| `metadata`    | object | 否   | 自定义元数据             |
 
 **Response Body (201)**：
 
@@ -1136,14 +1134,14 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `message.role` | string | 是 | 消息角色，通常为 `"user"` |
-| `message.content` | string | 是 | 消息内容 |
-| `options.stream` | boolean | 否 | 是否流式响应，默认 `false` |
-| `options.thinking` | string | 否 | 思维模式：`"none"` / `"low"` / `"high"` |
-| `options.max_tokens` | integer | 否 | 最大输出 token 数 |
-| `idempotency_key` | string | 否 | 幂等键，防止重复发送 |
+| 字段                 | 类型    | 必填 | 说明                                    |
+| -------------------- | ------- | ---- | --------------------------------------- |
+| `message.role`       | string  | 是   | 消息角色，通常为 `"user"`               |
+| `message.content`    | string  | 是   | 消息内容                                |
+| `options.stream`     | boolean | 否   | 是否流式响应，默认 `false`              |
+| `options.thinking`   | string  | 否   | 思维模式：`"none"` / `"low"` / `"high"` |
+| `options.max_tokens` | integer | 否   | 最大输出 token 数                       |
+| `idempotency_key`    | string  | 否   | 幂等键，防止重复发送                    |
 
 **Response Body (200) — 非流式**：
 
@@ -1174,10 +1172,10 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `offset` | integer | 0 | 跳过前 N 条 |
-| `limit` | integer | 50 | 每页数量 |
+| 参数     | 类型    | 默认值 | 说明        |
+| -------- | ------- | ------ | ----------- |
+| `offset` | integer | 0      | 跳过前 N 条 |
+| `limit`  | integer | 50     | 每页数量    |
 
 **Response Body (200)**：
 
@@ -1216,15 +1214,15 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/tasks` | 分页列出任务 | 自己Agent/admin |
-| POST | `/api/v1/tasks` | 创建任务 | admin/editor |
-| GET | `/api/v1/tasks/:taskId` | 获取任务详情 | 自己Agent/admin |
-| POST | `/api/v1/tasks/:taskId/transition` | 触发 FSM 状态转换 | admin/system |
-| GET | `/api/v1/tasks/:taskId/transitions` | 获取状态转换历史 | 已认证 |
-| POST | `/api/v1/tasks/:taskId/kill` | 强制终止任务 | admin |
-| POST | `/api/v1/tasks/:taskId/retry` | 重试失败/超时的任务 | admin |
+| HTTP 方法 | URL 路径                            | 功能描述            | 权限要求        |
+| --------- | ----------------------------------- | ------------------- | --------------- |
+| GET       | `/api/v1/tasks`                     | 分页列出任务        | 自己Agent/admin |
+| POST      | `/api/v1/tasks`                     | 创建任务            | admin/editor    |
+| GET       | `/api/v1/tasks/:taskId`             | 获取任务详情        | 自己Agent/admin |
+| POST      | `/api/v1/tasks/:taskId/transition`  | 触发 FSM 状态转换   | admin/system    |
+| GET       | `/api/v1/tasks/:taskId/transitions` | 获取状态转换历史    | 已认证          |
+| POST      | `/api/v1/tasks/:taskId/kill`        | 强制终止任务        | admin           |
+| POST      | `/api/v1/tasks/:taskId/retry`       | 重试失败/超时的任务 | admin           |
 
 ### GET `/api/v1/tasks`
 
@@ -1232,13 +1230,13 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `offset` | integer | 0 | 跳过前 N 条 |
-| `limit` | integer | 20 | 每页数量 |
-| `state` | string | — | 按状态过滤（支持逗号分隔多状态） |
-| `agent_id` | string | — | 按 Agent ID 过滤 |
-| `type` | string | — | 按任务类型过滤 |
+| 参数       | 类型    | 默认值 | 说明                             |
+| ---------- | ------- | ------ | -------------------------------- |
+| `offset`   | integer | 0      | 跳过前 N 条                      |
+| `limit`    | integer | 20     | 每页数量                         |
+| `state`    | string  | —      | 按状态过滤（支持逗号分隔多状态） |
+| `agent_id` | string  | —      | 按 Agent ID 过滤                 |
+| `type`     | string  | —      | 按任务类型过滤                   |
 
 **Response Body (200)**：
 
@@ -1288,17 +1286,17 @@ Request → AuthN → TenantContext → AuthZ → RateLimit → [Handler] → Co
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `agent_id` | string | 是 | 关联的 Agent ID |
-| `session_key` | string | 否 | 关联的会话 Key |
-| `parent_task_id` | string | 否 | 父任务 ID（子任务场景） |
-| `type` | string | 是 | `"llm_call"` / `"tool_execution"` / `"workflow_step"` / `"message_delivery"` / `"custom"` |
-| `input` | object | 否 | 任务输入数据 |
-| `priority` | string | 否 | `"high"` / `"normal"` / `"low"`，默认 `"normal"` |
-| `timeout_ms` | integer | 否 | 超时毫秒数，默认 60000 |
-| `max_attempts` | integer | 否 | 最大重试次数，默认 3 |
-| `idempotency_key` | string | 否 | 幂等键 |
+| 字段              | 类型    | 必填 | 说明                                                                                      |
+| ----------------- | ------- | ---- | ----------------------------------------------------------------------------------------- |
+| `agent_id`        | string  | 是   | 关联的 Agent ID                                                                           |
+| `session_key`     | string  | 否   | 关联的会话 Key                                                                            |
+| `parent_task_id`  | string  | 否   | 父任务 ID（子任务场景）                                                                   |
+| `type`            | string  | 是   | `"llm_call"` / `"tool_execution"` / `"workflow_step"` / `"message_delivery"` / `"custom"` |
+| `input`           | object  | 否   | 任务输入数据                                                                              |
+| `priority`        | string  | 否   | `"high"` / `"normal"` / `"low"`，默认 `"normal"`                                          |
+| `timeout_ms`      | integer | 否   | 超时毫秒数，默认 60000                                                                    |
+| `max_attempts`    | integer | 否   | 最大重试次数，默认 3                                                                      |
+| `idempotency_key` | string  | 否   | 幂等键                                                                                    |
 
 **Response Body (201)**：
 
@@ -1346,10 +1344,10 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `event` | string | 是 | FSM 事件：`"enqueue"` / `"start"` / `"complete"` / `"fail"` / `"pause"` / `"resume"` / `"kill"` / `"timeout_trigger"` / `"retry"` |
-| `reason` | string | 否 | 状态转换原因说明 |
+| 字段     | 类型   | 必填 | 说明                                                                                                                              |
+| -------- | ------ | ---- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `event`  | string | 是   | FSM 事件：`"enqueue"` / `"start"` / `"complete"` / `"fail"` / `"pause"` / `"resume"` / `"kill"` / `"timeout_trigger"` / `"retry"` |
+| `reason` | string | 否   | 状态转换原因说明                                                                                                                  |
 
 **Response Body (200)**：
 
@@ -1421,18 +1419,18 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/workflows` | 列出工作流定义 | 已认证 |
-| POST | `/api/v1/workflows` | 创建工作流定义 | admin/editor |
-| GET | `/api/v1/workflows/:workflowId` | 获取工作流定义详情 | 已认证 |
-| PUT | `/api/v1/workflows/:workflowId` | 更新工作流定义（新版本） | admin/editor |
-| DELETE | `/api/v1/workflows/:workflowId` | 删除工作流定义 | admin |
-| POST | `/api/v1/workflows/:workflowId/start` | 启动工作流实例 | admin/editor |
-| GET | `/api/v1/workflow-instances` | 列出工作流实例 | 已认证 |
-| GET | `/api/v1/workflow-instances/:instanceId` | 获取工作流实例详情 | 已认证 |
-| POST | `/api/v1/workflow-instances/:instanceId/signal` | 向工作流注入信号 | 启动者/admin |
-| POST | `/api/v1/workflow-instances/:instanceId/kill` | 终止工作流实例 | admin |
+| HTTP 方法 | URL 路径                                        | 功能描述                 | 权限要求     |
+| --------- | ----------------------------------------------- | ------------------------ | ------------ |
+| GET       | `/api/v1/workflows`                             | 列出工作流定义           | 已认证       |
+| POST      | `/api/v1/workflows`                             | 创建工作流定义           | admin/editor |
+| GET       | `/api/v1/workflows/:workflowId`                 | 获取工作流定义详情       | 已认证       |
+| PUT       | `/api/v1/workflows/:workflowId`                 | 更新工作流定义（新版本） | admin/editor |
+| DELETE    | `/api/v1/workflows/:workflowId`                 | 删除工作流定义           | admin        |
+| POST      | `/api/v1/workflows/:workflowId/start`           | 启动工作流实例           | admin/editor |
+| GET       | `/api/v1/workflow-instances`                    | 列出工作流实例           | 已认证       |
+| GET       | `/api/v1/workflow-instances/:instanceId`        | 获取工作流实例详情       | 已认证       |
+| POST      | `/api/v1/workflow-instances/:instanceId/signal` | 向工作流注入信号         | 启动者/admin |
+| POST      | `/api/v1/workflow-instances/:instanceId/kill`   | 终止工作流实例           | admin        |
 
 ### POST `/api/v1/workflows`
 
@@ -1473,21 +1471,21 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `id` | string | 是 | 工作流唯一标识 |
-| `name` | string | 是 | 工作流名称 |
-| `description` | string | 否 | 工作流描述 |
-| `steps` | array | 是 | 步骤定义列表 |
-| `steps[].id` | string | 是 | 步骤 ID |
-| `steps[].type` | string | 是 | `"agent_task"` / `"human_review"` / `"condition"` / `"parallel"` / `"wait_signal"` |
-| `steps[].config` | object | 是 | 步骤配置 |
-| `steps[].timeout_ms` | integer | 否 | 步骤超时时间 |
-| `transitions` | array | 是 | 步骤间转换关系 |
-| `transitions[].from` | string | 是 | 源步骤 ID |
-| `transitions[].to` | string | 是 | 目标步骤 ID |
-| `transitions[].condition` | string | 否 | 条件表达式，NULL 表示无条件转换 |
-| `timeout_ms` | integer | 否 | 工作流整体超时时间 |
+| 字段                      | 类型    | 必填 | 说明                                                                               |
+| ------------------------- | ------- | ---- | ---------------------------------------------------------------------------------- |
+| `id`                      | string  | 是   | 工作流唯一标识                                                                     |
+| `name`                    | string  | 是   | 工作流名称                                                                         |
+| `description`             | string  | 否   | 工作流描述                                                                         |
+| `steps`                   | array   | 是   | 步骤定义列表                                                                       |
+| `steps[].id`              | string  | 是   | 步骤 ID                                                                            |
+| `steps[].type`            | string  | 是   | `"agent_task"` / `"human_review"` / `"condition"` / `"parallel"` / `"wait_signal"` |
+| `steps[].config`          | object  | 是   | 步骤配置                                                                           |
+| `steps[].timeout_ms`      | integer | 否   | 步骤超时时间                                                                       |
+| `transitions`             | array   | 是   | 步骤间转换关系                                                                     |
+| `transitions[].from`      | string  | 是   | 源步骤 ID                                                                          |
+| `transitions[].to`        | string  | 是   | 目标步骤 ID                                                                        |
+| `transitions[].condition` | string  | 否   | 条件表达式，NULL 表示无条件转换                                                    |
+| `timeout_ms`              | integer | 否   | 工作流整体超时时间                                                                 |
 
 **Response Body (201)**：
 
@@ -1498,8 +1496,8 @@ killed    → (终态)
   "name": "Support Escalation Workflow",
   "version": 1,
   "is_active": true,
-  "steps": [ "..." ],
-  "transitions": [ "..." ],
+  "steps": ["..."],
+  "transitions": ["..."],
   "timeout_ms": 172800000,
   "created_at": "2026-03-21T10:00:00Z",
   "updated_at": "2026-03-21T10:00:00Z"
@@ -1583,10 +1581,10 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `type` | string | 是 | 信号类型标识 |
-| `data` | object | 是 | 信号数据 |
+| 字段   | 类型   | 必填 | 说明         |
+| ------ | ------ | ---- | ------------ |
+| `type` | string | 是   | 信号类型标识 |
+| `data` | object | 是   | 信号数据     |
 
 **Response Body (200)**：
 
@@ -1605,14 +1603,14 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/handoffs` | 列出转交请求 | 已认证 |
-| POST | `/api/v1/handoffs` | 创建转交请求 | admin/editor/system |
-| GET | `/api/v1/handoffs/:handoffId` | 获取转交请求详情 | 已认证 |
-| PUT | `/api/v1/handoffs/:handoffId/assign` | 分配给操作员 | admin |
-| PUT | `/api/v1/handoffs/:handoffId/resolve` | 提交处理结果 | 被分配者/admin |
-| PUT | `/api/v1/handoffs/:handoffId/cancel` | 取消转交请求 | admin |
+| HTTP 方法 | URL 路径                              | 功能描述         | 权限要求            |
+| --------- | ------------------------------------- | ---------------- | ------------------- |
+| GET       | `/api/v1/handoffs`                    | 列出转交请求     | 已认证              |
+| POST      | `/api/v1/handoffs`                    | 创建转交请求     | admin/editor/system |
+| GET       | `/api/v1/handoffs/:handoffId`         | 获取转交请求详情 | 已认证              |
+| PUT       | `/api/v1/handoffs/:handoffId/assign`  | 分配给操作员     | admin               |
+| PUT       | `/api/v1/handoffs/:handoffId/resolve` | 提交处理结果     | 被分配者/admin      |
+| PUT       | `/api/v1/handoffs/:handoffId/cancel`  | 取消转交请求     | admin               |
 
 ### POST `/api/v1/handoffs`
 
@@ -1631,14 +1629,14 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `task_id` | string | 否 | 关联的任务 ID |
-| `session_key` | string | 否 | 关联的会话 Key |
-| `agent_id` | string | 是 | 发起转交的 Agent ID |
-| `reason` | string | 是 | 转交原因 |
-| `priority` | string | 否 | `"high"` / `"normal"` / `"low"`，默认 `"normal"` |
-| `expires_at` | string | 否 | 请求过期时间 |
+| 字段          | 类型   | 必填 | 说明                                             |
+| ------------- | ------ | ---- | ------------------------------------------------ |
+| `task_id`     | string | 否   | 关联的任务 ID                                    |
+| `session_key` | string | 否   | 关联的会话 Key                                   |
+| `agent_id`    | string | 是   | 发起转交的 Agent ID                              |
+| `reason`      | string | 是   | 转交原因                                         |
+| `priority`    | string | 否   | `"high"` / `"normal"` / `"low"`，默认 `"normal"` |
+| `expires_at`  | string | 否   | 请求过期时间                                     |
 
 **Response Body (201)**：
 
@@ -1720,13 +1718,13 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/knowledge` | 搜索/列出知识条目 | 已认证 |
-| POST | `/api/v1/knowledge` | 创建知识条目 | admin/editor |
-| GET | `/api/v1/knowledge/:entryId` | 获取知识条目详情 | 已认证 |
-| PUT | `/api/v1/knowledge/:entryId` | 更新知识条目 | 创建者/admin |
-| DELETE | `/api/v1/knowledge/:entryId` | 删除知识条目 | 创建者/admin |
+| HTTP 方法 | URL 路径                     | 功能描述          | 权限要求     |
+| --------- | ---------------------------- | ----------------- | ------------ |
+| GET       | `/api/v1/knowledge`          | 搜索/列出知识条目 | 已认证       |
+| POST      | `/api/v1/knowledge`          | 创建知识条目      | admin/editor |
+| GET       | `/api/v1/knowledge/:entryId` | 获取知识条目详情  | 已认证       |
+| PUT       | `/api/v1/knowledge/:entryId` | 更新知识条目      | 创建者/admin |
+| DELETE    | `/api/v1/knowledge/:entryId` | 删除知识条目      | 创建者/admin |
 
 ### GET `/api/v1/knowledge`
 
@@ -1734,13 +1732,13 @@ killed    → (终态)
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `namespace` | string | — | 按命名空间过滤 |
-| `tags` | string | — | 按标签过滤（逗号分隔） |
-| `q` | string | — | 全文搜索关键词 |
-| `offset` | integer | 0 | 跳过前 N 条 |
-| `limit` | integer | 20 | 每页数量 |
+| 参数        | 类型    | 默认值 | 说明                   |
+| ----------- | ------- | ------ | ---------------------- |
+| `namespace` | string  | —      | 按命名空间过滤         |
+| `tags`      | string  | —      | 按标签过滤（逗号分隔） |
+| `q`         | string  | —      | 全文搜索关键词         |
+| `offset`    | integer | 0      | 跳过前 N 条            |
+| `limit`     | integer | 20     | 每页数量               |
 
 **Response Body (200)**：
 
@@ -1783,14 +1781,14 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `namespace` | string | 否 | 命名空间，默认 `"default"` |
-| `key` | string | 是 | 条目唯一键（namespace 内唯一） |
-| `content` | string | 是 | 知识内容 |
-| `content_type` | string | 否 | 内容类型，默认 `"text/plain"` |
-| `tags` | string[] | 否 | 标签列表 |
-| `metadata` | object | 否 | 自定义元数据 |
+| 字段           | 类型     | 必填 | 说明                           |
+| -------------- | -------- | ---- | ------------------------------ |
+| `namespace`    | string   | 否   | 命名空间，默认 `"default"`     |
+| `key`          | string   | 是   | 条目唯一键（namespace 内唯一） |
+| `content`      | string   | 是   | 知识内容                       |
+| `content_type` | string   | 否   | 内容类型，默认 `"text/plain"`  |
+| `tags`         | string[] | 否   | 标签列表                       |
+| `metadata`     | object   | 否   | 自定义元数据                   |
 
 **Response Body (201)**：
 
@@ -1816,12 +1814,12 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/api-keys` | 列出 API Key（用户看自己的，admin 看全部） | 已认证 |
-| POST | `/api/v1/api-keys` | 创建 API Key（明文仅返回一次） | 已认证 |
-| GET | `/api/v1/api-keys/:keyId` | 获取 API Key 详情（不含明文） | 自己/admin |
-| PUT | `/api/v1/api-keys/:keyId/revoke` | 吊销 API Key | 自己/admin |
+| HTTP 方法 | URL 路径                         | 功能描述                                   | 权限要求   |
+| --------- | -------------------------------- | ------------------------------------------ | ---------- |
+| GET       | `/api/v1/api-keys`               | 列出 API Key（用户看自己的，admin 看全部） | 已认证     |
+| POST      | `/api/v1/api-keys`               | 创建 API Key（明文仅返回一次）             | 已认证     |
+| GET       | `/api/v1/api-keys/:keyId`        | 获取 API Key 详情（不含明文）              | 自己/admin |
+| PUT       | `/api/v1/api-keys/:keyId/revoke` | 吊销 API Key                               | 自己/admin |
 
 ### POST `/api/v1/api-keys`
 
@@ -1837,11 +1835,11 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `name` | string | 是 | Key 名称 |
-| `scopes` | string[] | 否 | 允许的操作范围，默认空（继承用户权限） |
-| `expires_at` | string | 否 | 过期时间，NULL 表示永不过期 |
+| 字段         | 类型     | 必填 | 说明                                   |
+| ------------ | -------- | ---- | -------------------------------------- |
+| `name`       | string   | 是   | Key 名称                               |
+| `scopes`     | string[] | 否   | 允许的操作范围，默认空（继承用户权限） |
+| `expires_at` | string   | 否   | 过期时间，NULL 表示永不过期            |
 
 **Response Body (201)**：
 
@@ -1886,12 +1884,12 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/rate-limits` | 列出限流配置 | 已认证 |
-| POST | `/api/v1/rate-limits` | 创建限流配置 | admin |
-| PUT | `/api/v1/rate-limits/:configId` | 更新限流配置 | admin |
-| DELETE | `/api/v1/rate-limits/:configId` | 删除限流配置 | admin |
+| HTTP 方法 | URL 路径                        | 功能描述     | 权限要求 |
+| --------- | ------------------------------- | ------------ | -------- |
+| GET       | `/api/v1/rate-limits`           | 列出限流配置 | 已认证   |
+| POST      | `/api/v1/rate-limits`           | 创建限流配置 | admin    |
+| PUT       | `/api/v1/rate-limits/:configId` | 更新限流配置 | admin    |
+| DELETE    | `/api/v1/rate-limits/:configId` | 删除限流配置 | admin    |
 
 ### POST `/api/v1/rate-limits`
 
@@ -1911,15 +1909,15 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `scope_type` | string | 是 | `"tenant"` / `"user"` / `"api_key"` / `"ip"` |
-| `scope_id` | string | 否 | 具体作用对象 ID |
-| `resource` | string | 否 | 资源标识，默认 `"api"` |
-| `action` | string | 否 | 限制的具体操作 |
-| `max_requests` | integer | 是 | 窗口内最大请求数 |
-| `window_seconds` | integer | 是 | 时间窗口（秒） |
-| `burst_limit` | integer | 否 | 突发限额 |
+| 字段             | 类型    | 必填 | 说明                                         |
+| ---------------- | ------- | ---- | -------------------------------------------- |
+| `scope_type`     | string  | 是   | `"tenant"` / `"user"` / `"api_key"` / `"ip"` |
+| `scope_id`       | string  | 否   | 具体作用对象 ID                              |
+| `resource`       | string  | 否   | 资源标识，默认 `"api"`                       |
+| `action`         | string  | 否   | 限制的具体操作                               |
+| `max_requests`   | integer | 是   | 窗口内最大请求数                             |
+| `window_seconds` | integer | 是   | 时间窗口（秒）                               |
+| `burst_limit`    | integer | 否   | 突发限额                                     |
 
 **Response Body (201)**：
 
@@ -1946,11 +1944,11 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| POST | `/api/v1/messages` | 发送统一消息信封（通道无关） | admin/editor |
-| GET | `/api/v1/messages` | 查询消息历史 | 发送者/admin |
-| GET | `/api/v1/messages/:messageId` | 获取单条消息详情 | 发送者/admin |
+| HTTP 方法 | URL 路径                      | 功能描述                     | 权限要求     |
+| --------- | ----------------------------- | ---------------------------- | ------------ |
+| POST      | `/api/v1/messages`            | 发送统一消息信封（通道无关） | admin/editor |
+| GET       | `/api/v1/messages`            | 查询消息历史                 | 发送者/admin |
+| GET       | `/api/v1/messages/:messageId` | 获取单条消息详情             | 发送者/admin |
 
 ### POST `/api/v1/messages`
 
@@ -1978,21 +1976,21 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `source.type` | string | 是 | `"user"` / `"agent"` / `"system"` / `"webhook"` |
-| `source.id` | string | 是 | 来源标识 |
-| `source.channel` | string | 否 | 消息来源通道 |
-| `target.agent_id` | string | 是 | 目标 Agent ID |
-| `target.session_key` | string | 否 | 目标会话 Key |
-| `content.type` | string | 是 | `"text"` / `"rich"` / `"command"` / `"event"` |
-| `content.text` | string | 条件 | `type=text` 时的文本内容 |
-| `content.rich_elements` | array | 条件 | `type=rich` 时的结构化元素 |
-| `content.command` | object | 条件 | `type=command` 时的命令定义 |
-| `content.attachments` | array | 否 | 附件列表 |
-| `metadata` | object | 否 | 自定义元数据 |
-| `idempotency_key` | string | 否 | 幂等键 |
-| `reply_to` | string | 否 | 回复的消息 ID |
+| 字段                    | 类型   | 必填 | 说明                                            |
+| ----------------------- | ------ | ---- | ----------------------------------------------- |
+| `source.type`           | string | 是   | `"user"` / `"agent"` / `"system"` / `"webhook"` |
+| `source.id`             | string | 是   | 来源标识                                        |
+| `source.channel`        | string | 否   | 消息来源通道                                    |
+| `target.agent_id`       | string | 是   | 目标 Agent ID                                   |
+| `target.session_key`    | string | 否   | 目标会话 Key                                    |
+| `content.type`          | string | 是   | `"text"` / `"rich"` / `"command"` / `"event"`   |
+| `content.text`          | string | 条件 | `type=text` 时的文本内容                        |
+| `content.rich_elements` | array  | 条件 | `type=rich` 时的结构化元素                      |
+| `content.command`       | object | 条件 | `type=command` 时的命令定义                     |
+| `content.attachments`   | array  | 否   | 附件列表                                        |
+| `metadata`              | object | 否   | 自定义元数据                                    |
+| `idempotency_key`       | string | 否   | 幂等键                                          |
+| `reply_to`              | string | 否   | 回复的消息 ID                                   |
 
 **Response Body (202)**：
 
@@ -2015,11 +2013,11 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/audit/events` | 查询审计事件日志 | admin |
-| GET | `/api/v1/audit/events/:eventId` | 获取单条审计事件详情 | admin |
-| GET | `/api/v1/audit/metrics` | 获取审计管道指标 | admin |
+| HTTP 方法 | URL 路径                        | 功能描述             | 权限要求 |
+| --------- | ------------------------------- | -------------------- | -------- |
+| GET       | `/api/v1/audit/events`          | 查询审计事件日志     | admin    |
+| GET       | `/api/v1/audit/events/:eventId` | 获取单条审计事件详情 | admin    |
+| GET       | `/api/v1/audit/metrics`         | 获取审计管道指标     | admin    |
 
 > **安全说明**：审计记录不可修改、不可删除（RLS 策略禁止 UPDATE/DELETE）。仅 admin 角色可查询。
 
@@ -2029,18 +2027,18 @@ killed    → (终态)
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `from` | string (ISO 8601) | — | 起始时间 |
-| `to` | string (ISO 8601) | — | 结束时间 |
-| `category` | string | — | 审计类别过滤 |
-| `action` | string | — | 操作过滤（支持通配符） |
-| `actor_id` | string | — | 操作者 ID |
-| `outcome` | string | — | `"success"` / `"failure"` / `"denied"` |
-| `resource_type` | string | — | 资源类型 |
-| `request_id` | string | — | 请求链路 ID |
-| `offset` | integer | 0 | 偏移 |
-| `limit` | integer | 50 | 每页数量 |
+| 参数            | 类型              | 默认值 | 说明                                   |
+| --------------- | ----------------- | ------ | -------------------------------------- |
+| `from`          | string (ISO 8601) | —      | 起始时间                               |
+| `to`            | string (ISO 8601) | —      | 结束时间                               |
+| `category`      | string            | —      | 审计类别过滤                           |
+| `action`        | string            | —      | 操作过滤（支持通配符）                 |
+| `actor_id`      | string            | —      | 操作者 ID                              |
+| `outcome`       | string            | —      | `"success"` / `"failure"` / `"denied"` |
+| `resource_type` | string            | —      | 资源类型                               |
+| `request_id`    | string            | —      | 请求链路 ID                            |
+| `offset`        | integer           | 0      | 偏移                                   |
+| `limit`         | integer           | 50     | 每页数量                               |
 
 **Response Body (200)**：
 
@@ -2118,15 +2116,15 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/runtime-instances` | 列出运行时实例 | 已认证 |
-| POST | `/api/v1/runtime-instances` | 创建运行时实例 | admin/system |
-| GET | `/api/v1/runtime-instances/:instanceId` | 获取实例详情和资源使用 | 已认证 |
-| POST | `/api/v1/runtime-instances/:instanceId/start` | 启动实例 | admin/system |
-| POST | `/api/v1/runtime-instances/:instanceId/stop` | 优雅停止实例 | admin/system |
-| POST | `/api/v1/runtime-instances/:instanceId/kill` | 强制终止实例 | admin/system |
-| DELETE | `/api/v1/runtime-instances/:instanceId` | 清理已终止实例记录 | system |
+| HTTP 方法 | URL 路径                                      | 功能描述               | 权限要求     |
+| --------- | --------------------------------------------- | ---------------------- | ------------ |
+| GET       | `/api/v1/runtime-instances`                   | 列出运行时实例         | 已认证       |
+| POST      | `/api/v1/runtime-instances`                   | 创建运行时实例         | admin/system |
+| GET       | `/api/v1/runtime-instances/:instanceId`       | 获取实例详情和资源使用 | 已认证       |
+| POST      | `/api/v1/runtime-instances/:instanceId/start` | 启动实例               | admin/system |
+| POST      | `/api/v1/runtime-instances/:instanceId/stop`  | 优雅停止实例           | admin/system |
+| POST      | `/api/v1/runtime-instances/:instanceId/kill`  | 强制终止实例           | admin/system |
+| DELETE    | `/api/v1/runtime-instances/:instanceId`       | 清理已终止实例记录     | system       |
 
 ### POST `/api/v1/runtime-instances`
 
@@ -2164,20 +2162,20 @@ killed    → (终态)
 }
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `agent_id` | string | 是 | Agent ID |
-| `session_key` | string | 否 | 会话 Key |
-| `runtime_type` | string | 否 | `"inprocess"` / `"docker"` / `"kubernetes"`，默认由配置决定 |
-| `isolation.network.mode` | string | 否 | `"none"` / `"allowlist"` / `"full"` |
-| `isolation.network.allowed_hosts` | string[] | 否 | 出站白名单主机 |
-| `isolation.filesystem.workspace_access` | string | 否 | `"none"` / `"readonly"` / `"readwrite"` |
-| `isolation.resources.cpu_millicores` | integer | 否 | CPU 限制（毫核） |
-| `isolation.resources.memory_mb` | integer | 否 | 内存限制（MB） |
-| `image` | string | 否 | 容器镜像 |
-| `env` | object | 否 | 环境变量 |
-| `timeout_ms` | integer | 否 | 实例总超时 |
-| `idle_timeout_ms` | integer | 否 | 空闲超时 |
+| 字段                                    | 类型     | 必填 | 说明                                                        |
+| --------------------------------------- | -------- | ---- | ----------------------------------------------------------- |
+| `agent_id`                              | string   | 是   | Agent ID                                                    |
+| `session_key`                           | string   | 否   | 会话 Key                                                    |
+| `runtime_type`                          | string   | 否   | `"inprocess"` / `"docker"` / `"kubernetes"`，默认由配置决定 |
+| `isolation.network.mode`                | string   | 否   | `"none"` / `"allowlist"` / `"full"`                         |
+| `isolation.network.allowed_hosts`       | string[] | 否   | 出站白名单主机                                              |
+| `isolation.filesystem.workspace_access` | string   | 否   | `"none"` / `"readonly"` / `"readwrite"`                     |
+| `isolation.resources.cpu_millicores`    | integer  | 否   | CPU 限制（毫核）                                            |
+| `isolation.resources.memory_mb`         | integer  | 否   | 内存限制（MB）                                              |
+| `image`                                 | string   | 否   | 容器镜像                                                    |
+| `env`                                   | object   | 否   | 环境变量                                                    |
+| `timeout_ms`                            | integer  | 否   | 实例总超时                                                  |
+| `idle_timeout_ms`                       | integer  | 否   | 空闲超时                                                    |
 
 **Response Body (201)**：
 
@@ -2234,13 +2232,13 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/queues` | 列出所有队列及深度 | admin/system |
-| GET | `/api/v1/queues/:queueName/depth` | 获取队列深度 | admin/system |
-| GET | `/api/v1/queues/:queueName/dlq` | 查看死信队列消息 | admin |
-| POST | `/api/v1/queues/:queueName/dlq/:messageId/replay` | 重放死信消息 | admin |
-| POST | `/api/v1/queues/:queueName/purge` | 清空队列 | admin |
+| HTTP 方法 | URL 路径                                          | 功能描述           | 权限要求     |
+| --------- | ------------------------------------------------- | ------------------ | ------------ |
+| GET       | `/api/v1/queues`                                  | 列出所有队列及深度 | admin/system |
+| GET       | `/api/v1/queues/:queueName/depth`                 | 获取队列深度       | admin/system |
+| GET       | `/api/v1/queues/:queueName/dlq`                   | 查看死信队列消息   | admin        |
+| POST      | `/api/v1/queues/:queueName/dlq/:messageId/replay` | 重放死信消息       | admin        |
+| POST      | `/api/v1/queues/:queueName/purge`                 | 清空队列           | admin        |
 
 ### GET `/api/v1/queues`
 
@@ -2279,10 +2277,10 @@ killed    → (终态)
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `offset` | integer | 0 | 偏移 |
-| `limit` | integer | 20 | 每页数量 |
+| 参数     | 类型    | 默认值 | 说明     |
+| -------- | ------- | ------ | -------- |
+| `offset` | integer | 0      | 偏移     |
+| `limit`  | integer | 20     | 每页数量 |
 
 **Response Body (200)**：
 
@@ -2329,13 +2327,13 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/tasks/:taskId/checkpoints` | 获取任务的检查点列表 | 已认证 |
-| GET | `/api/v1/tasks/:taskId/checkpoints/latest` | 获取最新检查点 | 已认证 |
-| POST | `/api/v1/tasks/:taskId/checkpoints` | 创建检查点 | admin/system |
-| POST | `/api/v1/tasks/:taskId/checkpoints/:checkpointId/restore` | 从检查点恢复任务 | admin |
-| DELETE | `/api/v1/checkpoints/expired` | 清理过期检查点 | system |
+| HTTP 方法 | URL 路径                                                  | 功能描述             | 权限要求     |
+| --------- | --------------------------------------------------------- | -------------------- | ------------ |
+| GET       | `/api/v1/tasks/:taskId/checkpoints`                       | 获取任务的检查点列表 | 已认证       |
+| GET       | `/api/v1/tasks/:taskId/checkpoints/latest`                | 获取最新检查点       | 已认证       |
+| POST      | `/api/v1/tasks/:taskId/checkpoints`                       | 创建检查点           | admin/system |
+| POST      | `/api/v1/tasks/:taskId/checkpoints/:checkpointId/restore` | 从检查点恢复任务     | admin        |
+| DELETE    | `/api/v1/checkpoints/expired`                             | 清理过期检查点       | system       |
 
 ### GET `/api/v1/tasks/:taskId/checkpoints/latest`
 
@@ -2383,12 +2381,12 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/circuit-breakers` | 列出所有熔断器状态 | 已认证 |
-| GET | `/api/v1/circuit-breakers/:breakerId` | 获取熔断器详情和指标 | 已认证 |
-| POST | `/api/v1/circuit-breakers/:breakerId/reset` | 手动重置熔断器 | admin |
-| POST | `/api/v1/circuit-breakers/:breakerId/trip` | 手动触发熔断 | admin |
+| HTTP 方法 | URL 路径                                    | 功能描述             | 权限要求 |
+| --------- | ------------------------------------------- | -------------------- | -------- |
+| GET       | `/api/v1/circuit-breakers`                  | 列出所有熔断器状态   | 已认证   |
+| GET       | `/api/v1/circuit-breakers/:breakerId`       | 获取熔断器详情和指标 | 已认证   |
+| POST      | `/api/v1/circuit-breakers/:breakerId/reset` | 手动重置熔断器       | admin    |
+| POST      | `/api/v1/circuit-breakers/:breakerId/trip`  | 手动触发熔断         | admin    |
 
 ### GET `/api/v1/circuit-breakers`
 
@@ -2456,11 +2454,11 @@ killed    → (终态)
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/health` | 系统健康检查（聚合） | 公开 |
-| GET | `/api/v1/health/detailed` | 详细健康检查（各后端分项） | admin |
-| GET | `/api/v1/metrics` | Prometheus 格式指标端点 | 公开 |
+| HTTP 方法 | URL 路径                  | 功能描述                   | 权限要求 |
+| --------- | ------------------------- | -------------------------- | -------- |
+| GET       | `/api/v1/health`          | 系统健康检查（聚合）       | 公开     |
+| GET       | `/api/v1/health/detailed` | 详细健康检查（各后端分项） | admin    |
+| GET       | `/api/v1/metrics`         | Prometheus 格式指标端点    | 公开     |
 
 ### GET `/api/v1/health`
 
@@ -2602,11 +2600,11 @@ openclaw_audit_events_total{category="agent_action"} 8920
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/events` | 查询平台事件 | admin |
-| GET | `/api/v1/events/:eventId` | 获取单条平台事件 | admin |
-| GET | `/api/v1/events/stream` | SSE 流式订阅平台事件 | admin |
+| HTTP 方法 | URL 路径                  | 功能描述             | 权限要求 |
+| --------- | ------------------------- | -------------------- | -------- |
+| GET       | `/api/v1/events`          | 查询平台事件         | admin    |
+| GET       | `/api/v1/events/:eventId` | 获取单条平台事件     | admin    |
+| GET       | `/api/v1/events/stream`   | SSE 流式订阅平台事件 | admin    |
 
 ### GET `/api/v1/events`
 
@@ -2614,15 +2612,15 @@ openclaw_audit_events_total{category="agent_action"} 8920
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `type` | string | — | 事件类型过滤（支持 `*` 通配） |
-| `source` | string | — | 来源模块过滤 |
-| `from` | string | — | 起始时间 |
-| `to` | string | — | 结束时间 |
-| `processed` | boolean | — | 是否已处理 |
-| `offset` | integer | 0 | 偏移 |
-| `limit` | integer | 20 | 每页数量 |
+| 参数        | 类型    | 默认值 | 说明                          |
+| ----------- | ------- | ------ | ----------------------------- |
+| `type`      | string  | —      | 事件类型过滤（支持 `*` 通配） |
+| `source`    | string  | —      | 来源模块过滤                  |
+| `from`      | string  | —      | 起始时间                      |
+| `to`        | string  | —      | 结束时间                      |
+| `processed` | boolean | —      | 是否已处理                    |
+| `offset`    | integer | 0      | 偏移                          |
+| `limit`     | integer | 20     | 每页数量                      |
 
 **Response Body (200)**：
 
@@ -2657,8 +2655,8 @@ openclaw_audit_events_total{category="agent_action"} 8920
 
 **查询参数**：
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
+| 参数   | 类型   | 说明                                  |
+| ------ | ------ | ------------------------------------- |
 | `type` | string | 事件类型过滤模式（如 `task.state.*`） |
 
 **Response (Content-Type: text/event-stream)**：
@@ -2677,14 +2675,14 @@ data: {"id":"...","type":"agent.health","data":{"agent_id":"support-bot","status
 
 ### 端点列表
 
-| HTTP 方法 | URL 路径 | 功能描述 | 权限要求 |
-|-----------|---------|---------|---------|
-| GET | `/api/v1/kv/:collection` | 列出集合中的键值对 | 租户隔离 |
-| GET | `/api/v1/kv/:collection/:key` | 获取指定键的值 | 租户隔离 |
-| PUT | `/api/v1/kv/:collection/:key` | 设置/更新键值 | 租户隔离 |
-| DELETE | `/api/v1/kv/:collection/:key` | 删除键值 | 租户隔离 |
-| POST | `/api/v1/kv/:collection/batch-get` | 批量获取 | 租户隔离 |
-| POST | `/api/v1/kv/:collection/batch-set` | 批量设置 | 租户隔离 |
+| HTTP 方法 | URL 路径                           | 功能描述           | 权限要求 |
+| --------- | ---------------------------------- | ------------------ | -------- |
+| GET       | `/api/v1/kv/:collection`           | 列出集合中的键值对 | 租户隔离 |
+| GET       | `/api/v1/kv/:collection/:key`      | 获取指定键的值     | 租户隔离 |
+| PUT       | `/api/v1/kv/:collection/:key`      | 设置/更新键值      | 租户隔离 |
+| DELETE    | `/api/v1/kv/:collection/:key`      | 删除键值           | 租户隔离 |
+| POST      | `/api/v1/kv/:collection/batch-get` | 批量获取           | 租户隔离 |
+| POST      | `/api/v1/kv/:collection/batch-set` | 批量设置           | 租户隔离 |
 
 ### GET `/api/v1/kv/:collection`
 
@@ -2692,13 +2690,13 @@ data: {"id":"...","type":"agent.health","data":{"agent_id":"support-bot","status
 
 **查询参数**：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `prefix` | string | — | 键前缀过滤 |
-| `offset` | integer | 0 | 偏移 |
-| `limit` | integer | 20 | 每页数量 |
-| `order_by` | string | `created_at` | 排序字段 |
-| `order` | string | `desc` | 排序方向 |
+| 参数       | 类型    | 默认值       | 说明       |
+| ---------- | ------- | ------------ | ---------- |
+| `prefix`   | string  | —            | 键前缀过滤 |
+| `offset`   | integer | 0            | 偏移       |
+| `limit`    | integer | 20           | 每页数量   |
+| `order_by` | string  | `created_at` | 排序字段   |
+| `order`    | string  | `desc`       | 排序方向   |
 
 **Response Body (200)**：
 
@@ -2804,28 +2802,28 @@ data: {"id":"...","type":"agent.health","data":{"agent_id":"support-bot","status
 
 所有返回列表的 GET 端点统一支持以下分页参数：
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|-------|------|
-| `offset` | integer | 0 | 跳过前 N 条记录 |
-| `limit` | integer | 20 | 每页返回数量（最大 100） |
-| `order_by` | string | `created_at` | 排序字段 |
-| `order` | string | `desc` | 排序方向：`asc` / `desc` |
+| 参数       | 类型    | 默认值       | 说明                     |
+| ---------- | ------- | ------------ | ------------------------ |
+| `offset`   | integer | 0            | 跳过前 N 条记录          |
+| `limit`    | integer | 20           | 每页返回数量（最大 100） |
+| `order_by` | string  | `created_at` | 排序字段                 |
+| `order`    | string  | `desc`       | 排序方向：`asc` / `desc` |
 
 ### A.2 分页响应格式
 
 ```json
 {
-  "items": [ "..." ],
+  "items": ["..."],
   "total": 42,
   "has_more": true
 }
 ```
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `items` | array | 当前页数据 |
-| `total` | integer | 满足条件的总记录数 |
-| `has_more` | boolean | 是否有更多数据 |
+| 字段       | 类型    | 说明               |
+| ---------- | ------- | ------------------ |
+| `items`    | array   | 当前页数据         |
+| `total`    | integer | 满足条件的总记录数 |
+| `has_more` | boolean | 是否有更多数据     |
 
 ### A.3 通用错误响应
 
@@ -2914,98 +2912,98 @@ data: {"id":"...","type":"agent.health","data":{"agent_id":"support-bot","status
 
 ### A.4 HTTP 状态码使用约定
 
-| 状态码 | 使用场景 |
-|--------|---------|
-| 200 OK | GET 成功 / PUT/POST 操作成功（非创建） |
-| 201 Created | POST 创建资源成功 |
-| 202 Accepted | 异步操作已接受（如消息信封发送） |
-| 204 No Content | DELETE 成功 / 无返回体的操作 |
-| 400 Bad Request | 请求体验证失败 |
-| 401 Unauthorized | 未认证或令牌过期 |
-| 403 Forbidden | 认证成功但权限不足 |
-| 404 Not Found | 请求的资源不存在 |
-| 409 Conflict | 状态冲突（如 FSM 非法转换、唯一约束冲突） |
-| 429 Too Many Requests | 限流触发 |
-| 500 Internal Server Error | 服务器内部异常 |
-| 503 Service Unavailable | 服务不健康（健康检查失败） |
+| 状态码                    | 使用场景                                  |
+| ------------------------- | ----------------------------------------- |
+| 200 OK                    | GET 成功 / PUT/POST 操作成功（非创建）    |
+| 201 Created               | POST 创建资源成功                         |
+| 202 Accepted              | 异步操作已接受（如消息信封发送）          |
+| 204 No Content            | DELETE 成功 / 无返回体的操作              |
+| 400 Bad Request           | 请求体验证失败                            |
+| 401 Unauthorized          | 未认证或令牌过期                          |
+| 403 Forbidden             | 认证成功但权限不足                        |
+| 404 Not Found             | 请求的资源不存在                          |
+| 409 Conflict              | 状态冲突（如 FSM 非法转换、唯一约束冲突） |
+| 429 Too Many Requests     | 限流触发                                  |
+| 500 Internal Server Error | 服务器内部异常                            |
+| 503 Service Unavailable   | 服务不健康（健康检查失败）                |
 
 ### A.5 权限角色说明
 
 API 端点的权限控制与 RLS 策略保持一致：
 
-| 角色 | 说明 |
-|------|------|
-| **公开** | 无需认证（仅限 auth/login、health 等） |
-| **已认证** | 已通过 AuthN 中间件的任何用户 |
-| **自己** | 只能操作自己创建/拥有的资源 |
-| **创建者** | 只能操作自己创建的资源（如 Agent 创建者） |
+| 角色         | 说明                                            |
+| ------------ | ----------------------------------------------- |
+| **公开**     | 无需认证（仅限 auth/login、health 等）          |
+| **已认证**   | 已通过 AuthN 中间件的任何用户                   |
+| **自己**     | 只能操作自己创建/拥有的资源                     |
+| **创建者**   | 只能操作自己创建的资源（如 Agent 创建者）       |
 | **被分配者** | 只能操作分配给自己的资源（如 Handoff 被分配者） |
-| **editor** | 具有 editor 角色的用户 |
-| **admin** | 具有 admin 角色的用户（含 system） |
-| **system** | 系统内部调用角色（不暴露给终端用户） |
+| **editor**   | 具有 editor 角色的用户                          |
+| **admin**    | 具有 admin 角色的用户（含 system）              |
+| **system**   | 系统内部调用角色（不暴露给终端用户）            |
 
 ---
 
 ## 附录 B：与 PRD 模块的映射关系
 
-| PRD 模块 | PRD 接口 | API 资源域 |
-|---------|---------|-----------|
-| 内核抽象层 4.1 | StorageBackend | KV Store (`/api/v1/kv/`) |
-| 内核抽象层 4.2 | QueueBackend | Queues (`/api/v1/queues/`) |
-| 内核抽象层 4.5 | EventBus | Events (`/api/v1/events/`) |
-| 可治理 5.1.1 | IdentityProvider | Auth (`/api/v1/auth/`) |
-| 可治理 5.1.2 | PolicyEngine | Policies, AuthZ (`/api/v1/policies/`, `/api/v1/authz/`) |
-| 可治理 5.1.3 | ContentFilter | Content Filters (`/api/v1/content-filters/`) |
-| 可治理 — | QuotaManager | Quotas (`/api/v1/quotas/`) |
-| 可治理 — | UserDirectory | Users, Roles, Groups (`/api/v1/users/`, ...) |
-| 可审计 5.2 | AuditPipeline, AuditSink | Audit (`/api/v1/audit/`) |
-| 可协作 5.3.1 | Task, TaskFSM | Tasks (`/api/v1/tasks/`) |
-| 可协作 5.3.2 | WorkflowEngine | Workflows (`/api/v1/workflows/`) |
-| 可协作 — | HandoffManager | Handoffs (`/api/v1/handoffs/`) |
-| 可协作 — | KnowledgeStore | Knowledge (`/api/v1/knowledge/`) |
-| 可嵌入 5.4 | RestApiBuilder | 本文档整体 |
-| 可嵌入 5.4.1 | RateLimiter | Rate Limits (`/api/v1/rate-limits/`) |
-| 可嵌入 5.4.3 | MessageEnvelope | Messages (`/api/v1/messages/`) |
-| 可嵌入 — | ApiKeyManager | API Keys (`/api/v1/api-keys/`) |
-| 可隔离 5.5.1 | AgentRuntimeBackend | Runtime Instances (`/api/v1/runtime-instances/`) |
-| 可靠性 5.6.2 | CircuitBreaker | Circuit Breakers (`/api/v1/circuit-breakers/`) |
-| 可靠性 5.6.3 | CheckpointManager | Checkpoints (`/api/v1/tasks/:id/checkpoints/`) |
-| 可靠性 5.6.5 | MetricsProvider | Metrics (`/api/v1/metrics`) |
-| 可靠性 — | HealthAggregator | Health (`/api/v1/health/`) |
+| PRD 模块       | PRD 接口                 | API 资源域                                              |
+| -------------- | ------------------------ | ------------------------------------------------------- |
+| 内核抽象层 4.1 | StorageBackend           | KV Store (`/api/v1/kv/`)                                |
+| 内核抽象层 4.2 | QueueBackend             | Queues (`/api/v1/queues/`)                              |
+| 内核抽象层 4.5 | EventBus                 | Events (`/api/v1/events/`)                              |
+| 可治理 5.1.1   | IdentityProvider         | Auth (`/api/v1/auth/`)                                  |
+| 可治理 5.1.2   | PolicyEngine             | Policies, AuthZ (`/api/v1/policies/`, `/api/v1/authz/`) |
+| 可治理 5.1.3   | ContentFilter            | Content Filters (`/api/v1/content-filters/`)            |
+| 可治理 —       | QuotaManager             | Quotas (`/api/v1/quotas/`)                              |
+| 可治理 —       | UserDirectory            | Users, Roles, Groups (`/api/v1/users/`, ...)            |
+| 可审计 5.2     | AuditPipeline, AuditSink | Audit (`/api/v1/audit/`)                                |
+| 可协作 5.3.1   | Task, TaskFSM            | Tasks (`/api/v1/tasks/`)                                |
+| 可协作 5.3.2   | WorkflowEngine           | Workflows (`/api/v1/workflows/`)                        |
+| 可协作 —       | HandoffManager           | Handoffs (`/api/v1/handoffs/`)                          |
+| 可协作 —       | KnowledgeStore           | Knowledge (`/api/v1/knowledge/`)                        |
+| 可嵌入 5.4     | RestApiBuilder           | 本文档整体                                              |
+| 可嵌入 5.4.1   | RateLimiter              | Rate Limits (`/api/v1/rate-limits/`)                    |
+| 可嵌入 5.4.3   | MessageEnvelope          | Messages (`/api/v1/messages/`)                          |
+| 可嵌入 —       | ApiKeyManager            | API Keys (`/api/v1/api-keys/`)                          |
+| 可隔离 5.5.1   | AgentRuntimeBackend      | Runtime Instances (`/api/v1/runtime-instances/`)        |
+| 可靠性 5.6.2   | CircuitBreaker           | Circuit Breakers (`/api/v1/circuit-breakers/`)          |
+| 可靠性 5.6.3   | CheckpointManager        | Checkpoints (`/api/v1/tasks/:id/checkpoints/`)          |
+| 可靠性 5.6.5   | MetricsProvider          | Metrics (`/api/v1/metrics`)                             |
+| 可靠性 —       | HealthAggregator         | Health (`/api/v1/health/`)                              |
 
 ---
 
 ## 附录 C：与数据库表的映射关系
 
-| API 资源 | 数据库表 | 备注 |
-|---------|---------|------|
-| Tenants | `tenants` | |
-| Users | `users` | |
-| Roles | `roles` | |
-| Permissions | `permissions` | |
-| Role-Permission 关联 | `role_permissions` | |
-| User-Role 分配 | `user_role_assignments` | |
-| User Groups | `user_groups` | |
-| Group Members | `user_group_members` | |
-| Policies | `policy_definitions` + `policy_rules` | 策略创建时同步创建规则 |
-| Content Filters | `content_filter_rules` | |
-| Quotas | `quota_configs` + `quota_usage` | |
-| Agents | `agents` | |
-| Sessions | `sessions` | RLS 隔离 |
-| Session Messages | `session_messages` | RLS 隔离，不可修改/删除 |
-| Tasks | `tasks` | FSM 严格管理 state 列 |
-| Task Transitions | `task_state_transitions` | 不可变追加 |
-| Workflows | `workflow_definitions` + `workflow_steps` + `workflow_transitions` | |
-| Workflow Instances | `workflow_instances` + `workflow_step_results` | 列级安全限制 |
-| Handoffs | `handoff_requests` | |
-| Knowledge | `knowledge_entries` | |
-| API Keys | `api_keys` | 不可物理删除 |
-| Rate Limits | `rate_limit_configs` | |
-| Messages | `message_envelopes` | 不可修改/删除 |
-| Audit Events | `audit_events` | 不可修改/删除 |
-| Runtime Instances | `runtime_instances` | |
-| Queue Messages | `queue_messages` | SKIP LOCKED 消费模式 |
-| Checkpoints | `checkpoints` | 不可修改，system 可清理 |
-| Circuit Breakers | `circuit_breaker_states` | |
-| Platform Events | `platform_events` | 不可删除 |
-| KV Store | `enterprise_kv` | RLS 隔离 |
+| API 资源             | 数据库表                                                           | 备注                    |
+| -------------------- | ------------------------------------------------------------------ | ----------------------- |
+| Tenants              | `tenants`                                                          |                         |
+| Users                | `users`                                                            |                         |
+| Roles                | `roles`                                                            |                         |
+| Permissions          | `permissions`                                                      |                         |
+| Role-Permission 关联 | `role_permissions`                                                 |                         |
+| User-Role 分配       | `user_role_assignments`                                            |                         |
+| User Groups          | `user_groups`                                                      |                         |
+| Group Members        | `user_group_members`                                               |                         |
+| Policies             | `policy_definitions` + `policy_rules`                              | 策略创建时同步创建规则  |
+| Content Filters      | `content_filter_rules`                                             |                         |
+| Quotas               | `quota_configs` + `quota_usage`                                    |                         |
+| Agents               | `agents`                                                           |                         |
+| Sessions             | `sessions`                                                         | RLS 隔离                |
+| Session Messages     | `session_messages`                                                 | RLS 隔离，不可修改/删除 |
+| Tasks                | `tasks`                                                            | FSM 严格管理 state 列   |
+| Task Transitions     | `task_state_transitions`                                           | 不可变追加              |
+| Workflows            | `workflow_definitions` + `workflow_steps` + `workflow_transitions` |                         |
+| Workflow Instances   | `workflow_instances` + `workflow_step_results`                     | 列级安全限制            |
+| Handoffs             | `handoff_requests`                                                 |                         |
+| Knowledge            | `knowledge_entries`                                                |                         |
+| API Keys             | `api_keys`                                                         | 不可物理删除            |
+| Rate Limits          | `rate_limit_configs`                                               |                         |
+| Messages             | `message_envelopes`                                                | 不可修改/删除           |
+| Audit Events         | `audit_events`                                                     | 不可修改/删除           |
+| Runtime Instances    | `runtime_instances`                                                |                         |
+| Queue Messages       | `queue_messages`                                                   | SKIP LOCKED 消费模式    |
+| Checkpoints          | `checkpoints`                                                      | 不可修改，system 可清理 |
+| Circuit Breakers     | `circuit_breaker_states`                                           |                         |
+| Platform Events      | `platform_events`                                                  | 不可删除                |
+| KV Store             | `enterprise_kv`                                                    | RLS 隔离                |

@@ -5,8 +5,8 @@
  * SecretRef "env" source mechanism. Write/delete are not supported.
  */
 
-import type { TenantContext } from "../../kernel/tenant-context.ts";
 import type { SecretBackend } from "../../kernel/secret.ts";
+import type { TenantContext } from "../../kernel/tenant-context.ts";
 
 export class EnvSecretBackend implements SecretBackend {
   async initialize(): Promise<void> {}

@@ -14,9 +14,9 @@
  *   - Complex state rollback
  */
 
-import type { TenantContext } from "../../../kernel/tenant-context.ts";
-import type { StorageBackend } from "../../../kernel/storage.ts";
 import type { EventBus } from "../../../kernel/event-bus.ts";
+import type { StorageBackend } from "../../../kernel/storage.ts";
+import type { TenantContext } from "../../../kernel/tenant-context.ts";
 import type {
   WorkflowEngine,
   WorkflowDefinition,
@@ -94,12 +94,19 @@ export class SimpleWorkflowEngine implements WorkflowEngine {
     return instance;
   }
 
-  async getWorkflowInstance(ctx: TenantContext, instanceId: string): Promise<WorkflowInstance | null> {
+  async getWorkflowInstance(
+    ctx: TenantContext,
+    instanceId: string,
+  ): Promise<WorkflowInstance | null> {
     return this.storage.get<PersistedInstance>(ctx, COLLECTION_INSTANCES, instanceId);
   }
 
   async signal(ctx: TenantContext, instanceId: string, signal: WorkflowSignal): Promise<void> {
-    const instance = await this.storage.get<PersistedInstance>(ctx, COLLECTION_INSTANCES, instanceId);
+    const instance = await this.storage.get<PersistedInstance>(
+      ctx,
+      COLLECTION_INSTANCES,
+      instanceId,
+    );
     if (!instance) throw new Error(`Workflow instance not found: ${instanceId}`);
 
     await this.eventBus.publish({
@@ -164,7 +171,11 @@ export class SimpleWorkflowEngine implements WorkflowEngine {
       }
 
       case "parallel": {
-        instance.stepResults.push({ stepId: step.id, type: "parallel", note: "not supported in SimpleWorkflowEngine" });
+        instance.stepResults.push({
+          stepId: step.id,
+          type: "parallel",
+          note: "not supported in SimpleWorkflowEngine",
+        });
         break;
       }
     }
@@ -175,7 +186,11 @@ export class SimpleWorkflowEngine implements WorkflowEngine {
     await this.executeStep(ctx, instance, definition);
   }
 
-  private async failInstance(ctx: TenantContext, instance: PersistedInstance, error: string): Promise<void> {
+  private async failInstance(
+    ctx: TenantContext,
+    instance: PersistedInstance,
+    error: string,
+  ): Promise<void> {
     instance.state = "failed";
     instance.error = error;
     instance.updatedAt = new Date();

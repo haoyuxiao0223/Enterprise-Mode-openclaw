@@ -5,8 +5,8 @@
  * with exponential backoff.
  */
 
-import type { AuditSink, AuditSinkCapabilities } from "../audit-sink.ts";
 import type { AuditEvent } from "../audit-event.ts";
+import type { AuditSink, AuditSinkCapabilities } from "../audit-sink.ts";
 
 export interface WebhookSinkConfig {
   url: string;
@@ -42,10 +42,7 @@ export class WebhookAuditSink implements AuditSink {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(
-          () => controller.abort(),
-          this.config.timeoutMs ?? 10_000,
-        );
+        const timeoutId = setTimeout(() => controller.abort(), this.config.timeoutMs ?? 10_000);
 
         const response = await fetch(this.config.url, {
           method: "POST",

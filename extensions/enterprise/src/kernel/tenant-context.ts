@@ -22,9 +22,7 @@ export interface TenantContext {
 export type TenantContextSource = "api" | "channel" | "cron" | "internal";
 
 /** Creates a minimal TenantContext for internal / personal-edition use. */
-export function createDefaultTenantContext(
-  overrides?: Partial<TenantContext>,
-): TenantContext {
+export function createDefaultTenantContext(overrides?: Partial<TenantContext>): TenantContext {
   return {
     tenantId: "default",
     requestId: crypto.randomUUID(),

@@ -10,8 +10,8 @@
  */
 
 import { PureAbility, AbilityBuilder } from "@casl/ability";
-import type { TenantContext } from "../../../kernel/tenant-context.ts";
 import type { StorageBackend } from "../../../kernel/storage.ts";
+import type { TenantContext } from "../../../kernel/tenant-context.ts";
 import { createDefaultTenantContext } from "../../../kernel/tenant-context.ts";
 import type {
   PolicyEngine,

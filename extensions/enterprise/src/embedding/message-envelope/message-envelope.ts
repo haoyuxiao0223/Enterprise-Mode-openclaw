@@ -32,7 +32,12 @@ export interface EnvelopeMetadata {
 export interface MessageEnvelopeFactory {
   create<T>(input: EnvelopeInput<T>): MessageEnvelope<T>;
   validate(envelope: MessageEnvelope): EnvelopeValidationResult;
-  wrap<T>(tenantId: string, agentId: string, payload: T, options?: Partial<EnvelopeInput<T>>): MessageEnvelope<T>;
+  wrap<T>(
+    tenantId: string,
+    agentId: string,
+    payload: T,
+    options?: Partial<EnvelopeInput<T>>,
+  ): MessageEnvelope<T>;
 }
 
 export interface EnvelopeInput<T = unknown> {

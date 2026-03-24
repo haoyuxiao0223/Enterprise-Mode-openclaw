@@ -67,11 +67,7 @@ export class InProcessLockBackend implements LockBackend {
     return true;
   }
 
-  electLeader(
-    group: string,
-    candidateId: string,
-    options: LeaderElectionOptions,
-  ): LeaderElection {
+  electLeader(group: string, candidateId: string, options: LeaderElectionOptions): LeaderElection {
     let leader = false;
     let electedHandler: (() => void) | undefined;
     let deposedHandler: (() => void) | undefined;

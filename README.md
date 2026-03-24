@@ -111,7 +111,19 @@ Note: `pnpm openclaw ...` runs TypeScript directly (via `tsx`). `pnpm build` pro
 
 ### Enterprise mode (optional)
 
-OpenClaw includes an enterprise architecture layer (`src/enterprise/`) for multi-tenant, team, and production deployments. It is **disabled by default** and the personal edition works exactly as before with zero external dependencies.
+OpenClaw includes an enterprise extension (`extensions/enterprise/`) for multi-tenant, team, and production deployments. It is implemented as a standard OpenClaw plugin using `definePluginEntry`, `registerService`, `registerHttpRoute`, `onConversationBindingResolved`, and `registerCommand` APIs. Enterprise mode is **disabled by default** and the personal edition works exactly as before with zero external dependencies.
+
+**Requires:** OpenClaw `>= 2026.3.23`
+
+**Architecture highlights:**
+
+- **Kernel** — pluggable Storage, Queue, Cache, EventBus, Lock, and Secret backends (memory, PostgreSQL, Redis)
+- **Governance** — identity providers (token/OIDC), policy engines (RBAC/scope), content filtering, and quota management
+- **Audit** — mandatory audit pipeline with pluggable sinks (log, storage, webhook, eventbus) and conversation binding audit trail
+- **Collaboration** — task FSM, workflow engine, handoff manager, and knowledge store
+- **Isolation** — agent runtime backends (Kubernetes) and resource limiting
+- **Reliability** — circuit breaker, retry, checkpoint, timeout, health checks, and Prometheus metrics
+- **Chat commands** — `/enterprise status|audit|health|help` for operator-facing diagnostics
 
 To develop with enterprise features locally (requires Docker):
 
@@ -133,6 +145,15 @@ pnpm gateway:watch
 
 Enterprise REST API endpoints: `http://localhost:18789/api/v1/health`, `/api/v1/auth/login`, `/api/v1/sessions`, `/api/v1/agents`, etc.
 
+Enterprise chat commands (in any connected channel):
+
+```
+/enterprise status   — module overview and activation state
+/enterprise audit    — audit pipeline metrics (buffered events, sinks)
+/enterprise health   — reliability module health checks
+/enterprise help     — list available subcommands
+```
+
 Full Docker deployment (gateway + PG + Redis):
 
 ```bash
@@ -146,7 +167,7 @@ Kubernetes deployment via Helm:
 helm install openclaw deploy/helm/openclaw-enterprise -f deploy/helm/openclaw-enterprise/values.yaml
 ```
 
-Enterprise architecture docs: `PRD-openclaw-enterprise-architecture.md`, `tech-desigh.md`, `api-design.md`.
+Enterprise architecture docs: `PRD-openclaw-enterprise-architecture.md`, `tech-design.md`, `api-design.md`.
 
 ## Security defaults (DM access)
 

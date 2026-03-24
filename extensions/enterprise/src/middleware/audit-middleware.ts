@@ -2,8 +2,8 @@
  * Audit middleware — emits audit events for every API request.
  */
 
-import type { AuditPipeline } from "../audit/audit-pipeline.ts";
 import type { AuditEvent } from "../audit/audit-event.ts";
+import type { AuditPipeline } from "../audit/audit-pipeline.ts";
 import type { Middleware } from "./types.ts";
 
 export interface AuditMiddlewareOptions {

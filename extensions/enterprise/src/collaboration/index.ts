@@ -1,4 +1,11 @@
-export type { Task, TaskType, TaskState, TaskStateTransition, TaskError, TaskCheckpoint } from "./task/task-types.ts";
+export type {
+  Task,
+  TaskType,
+  TaskState,
+  TaskStateTransition,
+  TaskError,
+  TaskCheckpoint,
+} from "./task/task-types.ts";
 export { TaskFSM, IllegalStateTransitionError } from "./task/task-fsm.ts";
 export type { TaskEvent } from "./task/task-fsm.ts";
 
@@ -12,11 +19,7 @@ export type {
   WorkflowSignal,
 } from "./workflow/workflow-engine.ts";
 
-export type {
-  HandoffManager,
-  HandoffRequest,
-  HandoffResult,
-} from "./handoff/handoff-manager.ts";
+export type { HandoffManager, HandoffRequest, HandoffResult } from "./handoff/handoff-manager.ts";
 
 export type {
   KnowledgeStore,

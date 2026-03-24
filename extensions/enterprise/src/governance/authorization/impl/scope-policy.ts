@@ -23,8 +23,8 @@ export class ScopePolicyEngine implements PolicyEngine {
     }
 
     const requiredScope = `${request.resource.type}.${request.action}`;
-    const hasScope = request.subject.roles.some((role) =>
-      SCOPE_MAP[role]?.includes(requiredScope) ?? false,
+    const hasScope = request.subject.roles.some(
+      (role) => SCOPE_MAP[role]?.includes(requiredScope) ?? false,
     );
 
     if (hasScope) return { allowed: true };
@@ -43,12 +43,7 @@ export class ScopePolicyEngine implements PolicyEngine {
 }
 
 const SCOPE_MAP: Record<string, string[]> = {
-  viewer: [
-    "session.read",
-    "agent.read",
-    "config.read",
-    "channel.read",
-  ],
+  viewer: ["session.read", "agent.read", "config.read", "channel.read"],
   operator: [
     "session.read",
     "session.create",

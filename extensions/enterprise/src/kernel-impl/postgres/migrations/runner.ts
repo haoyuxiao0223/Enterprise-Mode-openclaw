@@ -42,10 +42,7 @@ export async function ensureMigrationsTable(db: Kysely<DatabaseSchema>): Promise
 }
 
 export async function getAppliedVersions(db: Kysely<DatabaseSchema>): Promise<Set<string>> {
-  const rows = await db
-    .selectFrom("schema_migrations")
-    .select("version")
-    .execute();
+  const rows = await db.selectFrom("schema_migrations").select("version").execute();
   return new Set(rows.map((r) => r.version));
 }
 

@@ -290,9 +290,7 @@ export async function bootstrapEnterprise(
 /**
  * 企业模块关闭。按创建的逆序执行。
  */
-export async function shutdownEnterprise(
-  modules: EnterpriseModules,
-): Promise<void> {
+export async function shutdownEnterprise(modules: EnterpriseModules): Promise<void> {
   // 先关闭六维模块
   // ... 各模块 shutdown
 
@@ -338,27 +336,19 @@ export async function buildKernel(
   };
 }
 
-async function resolveStorageBackend(
-  config?: { backend?: string },
-): Promise<StorageBackend> {
+async function resolveStorageBackend(config?: { backend?: string }): Promise<StorageBackend> {
   const backend = config?.backend ?? "memory";
   switch (backend) {
     case "memory": {
-      const { MemoryStorageBackend } = await import(
-        "./kernel-impl/memory/storage.ts"
-      );
+      const { MemoryStorageBackend } = await import("./kernel-impl/memory/storage.ts");
       return new MemoryStorageBackend();
     }
     case "filesystem": {
-      const { FileSystemStorageBackend } = await import(
-        "./kernel-impl/filesystem/storage.ts"
-      );
+      const { FileSystemStorageBackend } = await import("./kernel-impl/filesystem/storage.ts");
       return new FileSystemStorageBackend();
     }
     case "postgres": {
-      const { PostgresStorageBackend } = await import(
-        "./kernel-impl/postgres/storage.ts"
-      );
+      const { PostgresStorageBackend } = await import("./kernel-impl/postgres/storage.ts");
       return new PostgresStorageBackend(config);
     }
     default: {
@@ -429,9 +419,7 @@ export type TenantContextSource = "api" | "channel" | "cron" | "internal";
  * 个人版默认上下文。
  * 当 enterprise.enabled = false 时，所有操作使用此上下文。
  */
-export function createDefaultTenantContext(
-  requestId?: string,
-): TenantContext {
+export function createDefaultTenantContext(requestId?: string): TenantContext {
   return {
     tenantId: "default",
     requestId: requestId ?? crypto.randomUUID(),
@@ -468,7 +456,11 @@ export interface StorageBackend {
   ): Promise<T>;
 
   batchGet<T>(ctx: TenantContext, collection: string, keys: string[]): Promise<Map<string, T>>;
-  batchSet<T>(ctx: TenantContext, collection: string, entries: Array<{ key: string; value: T }>): Promise<void>;
+  batchSet<T>(
+    ctx: TenantContext,
+    collection: string,
+    entries: Array<{ key: string; value: T }>,
+  ): Promise<void>;
 
   transaction?<T>(ctx: TenantContext, fn: (tx: StorageTransaction) => Promise<T>): Promise<T>;
 }
@@ -500,7 +492,12 @@ export interface StorageTransaction {
 ```typescript
 // src/enterprise/kernel-impl/memory/storage.ts
 
-import type { StorageBackend, StorageQuery, PaginatedResult, StorageTransaction } from "../../kernel/storage.ts";
+import type {
+  StorageBackend,
+  StorageQuery,
+  PaginatedResult,
+  StorageTransaction,
+} from "../../kernel/storage.ts";
 import type { TenantContext } from "../../kernel/tenant-context.ts";
 import type { HealthStatus } from "../../kernel/health.ts";
 
@@ -516,8 +513,12 @@ import type { HealthStatus } from "../../kernel/health.ts";
 export class MemoryStorageBackend implements StorageBackend {
   private store = new Map<string, unknown>();
 
-  async initialize(): Promise<void> { /* no-op */ }
-  async shutdown(): Promise<void> { this.store.clear(); }
+  async initialize(): Promise<void> {
+    /* no-op */
+  }
+  async shutdown(): Promise<void> {
+    this.store.clear();
+  }
 
   async healthCheck(): Promise<HealthStatus> {
     return { healthy: true, latencyMs: 0 };
@@ -538,7 +539,11 @@ export class MemoryStorageBackend implements StorageBackend {
     return this.store.delete(ck);
   }
 
-  async list<T>(ctx: TenantContext, collection: string, query: StorageQuery): Promise<PaginatedResult<T>> {
+  async list<T>(
+    ctx: TenantContext,
+    collection: string,
+    query: StorageQuery,
+  ): Promise<PaginatedResult<T>> {
     const prefix = `${ctx.tenantId}:${collection}:`;
     const queryPrefix = query.prefix ? `${prefix}${query.prefix}` : prefix;
 
@@ -572,7 +577,11 @@ export class MemoryStorageBackend implements StorageBackend {
     return updated;
   }
 
-  async batchGet<T>(ctx: TenantContext, collection: string, keys: string[]): Promise<Map<string, T>> {
+  async batchGet<T>(
+    ctx: TenantContext,
+    collection: string,
+    keys: string[],
+  ): Promise<Map<string, T>> {
     const result = new Map<string, T>();
     for (const key of keys) {
       const val = await this.get<T>(ctx, collection, key);
@@ -689,7 +698,9 @@ export class MemoryQueueBackend implements QueueBackend {
   private dedupeCache = new Map<string, number>(); // key → expireAt timestamp
   private subscriptions = new Map<string, Set<QueueHandler>>();
 
-  async initialize(): Promise<void> { /* no-op */ }
+  async initialize(): Promise<void> {
+    /* no-op */
+  }
 
   async shutdown(): Promise<void> {
     // 取消所有 setTimeout、清空队列
@@ -711,10 +722,7 @@ export class MemoryQueueBackend implements QueueBackend {
       if (existing && existing > Date.now()) {
         return message.id; // 已存在，跳过
       }
-      this.dedupeCache.set(
-        options.idempotencyKey,
-        Date.now() + (options.ttl ?? 300_000),
-      );
+      this.dedupeCache.set(options.idempotencyKey, Date.now() + (options.ttl ?? 300_000));
     }
 
     // 延迟队列
@@ -727,11 +735,7 @@ export class MemoryQueueBackend implements QueueBackend {
     return message.id;
   }
 
-  subscribe(
-    queue: string,
-    handler: QueueHandler,
-    _options?: SubscribeOptions,
-  ): QueueSubscription {
+  subscribe(queue: string, handler: QueueHandler, _options?: SubscribeOptions): QueueSubscription {
     if (!this.subscriptions.has(queue)) {
       this.subscriptions.set(queue, new Set());
     }
@@ -783,9 +787,7 @@ class PriorityQueue {
   private low: QueueMessage[] = [];
 
   push(msg: QueueMessage): void {
-    const q = msg.priority === "high" ? this.high
-      : msg.priority === "low" ? this.low
-      : this.normal;
+    const q = msg.priority === "high" ? this.high : msg.priority === "low" ? this.low : this.normal;
     q.push(msg);
   }
 
@@ -847,7 +849,7 @@ export class MemoryCacheBackend implements CacheBackend {
   }
 
   async setIfAbsent<T>(key: string, value: T, ttlMs: number): Promise<boolean> {
-    if (await this.get(key) !== null) return false;
+    if ((await this.get(key)) !== null) return false;
     await this.set(key, value, ttlMs);
     return true;
   }
@@ -886,7 +888,9 @@ export class InProcessEventBus implements EventBus {
   private emitter = new EventEmitter();
   private patternHandlers = new Map<string, Set<{ pattern: string; handler: EventHandler }>>();
 
-  async initialize(): Promise<void> { /* no-op */ }
+  async initialize(): Promise<void> {
+    /* no-op */
+  }
   async shutdown(): Promise<void> {
     this.emitter.removeAllListeners();
     this.patternHandlers.clear();
@@ -1049,7 +1053,9 @@ export class MemorySecretBackend implements SecretBackend {
   private secrets = new Map<string, string>();
 
   async initialize(): Promise<void> {}
-  async shutdown(): Promise<void> { this.secrets.clear(); }
+  async shutdown(): Promise<void> {
+    this.secrets.clear();
+  }
 
   async getSecret(_ctx: TenantContext, path: string): Promise<string | null> {
     return this.secrets.get(path) ?? null;
@@ -1088,16 +1094,16 @@ export class SecretRefBackend implements SecretBackend {
 
 以下列出 Phase 0 中需要创建"桥接适配器"的现有代码位置。**每个桥接都是在企业模块内部调用现有函数，不修改现有函数本身**。
 
-| 现有代码 | 企业版桥接 | 桥接方式 |
-|----------|------------|----------|
-| `src/config/sessions/store.ts` → `loadSessionStore` | `FileSystemStorageBackend.get("sessions", key)` | 内部调用 `loadSessionStore` 后按 key 过滤 |
-| `src/config/sessions/store.ts` → `updateSessionStoreEntry` | `FileSystemStorageBackend.set("sessions", key, val)` | 内部调用 `updateSessionStoreEntry` |
-| `src/config/io.ts` → `loadConfig` | `FileSystemStorageBackend.get("config", key)` | 内部调用 `loadConfig` |
-| `src/process/command-queue.ts` → `enqueueCommand` | `MemoryQueueBackend.enqueue` | 复用相同的 lane-aware FIFO 逻辑，新增优先级/DLQ |
-| `src/agents/session-write-lock.ts` | `InProcessLockBackend.acquire` | 内存锁，与文件锁语义一致 |
-| `src/config/types.secrets.ts` → `SecretRef` | `SecretRefBackend.getSecret` | 内部调用 `resolveSecretRefValues` |
-| `src/infra/outbound/delivery-queue.ts` | `FileSystemQueueBackend.enqueue` | 保留磁盘持久化语义 |
-| 散落的 EventEmitter 使用 | `InProcessEventBus.subscribe` | 新的企业事件走 EventBus |
+| 现有代码                                                   | 企业版桥接                                           | 桥接方式                                        |
+| ---------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------- |
+| `src/config/sessions/store.ts` → `loadSessionStore`        | `FileSystemStorageBackend.get("sessions", key)`      | 内部调用 `loadSessionStore` 后按 key 过滤       |
+| `src/config/sessions/store.ts` → `updateSessionStoreEntry` | `FileSystemStorageBackend.set("sessions", key, val)` | 内部调用 `updateSessionStoreEntry`              |
+| `src/config/io.ts` → `loadConfig`                          | `FileSystemStorageBackend.get("config", key)`        | 内部调用 `loadConfig`                           |
+| `src/process/command-queue.ts` → `enqueueCommand`          | `MemoryQueueBackend.enqueue`                         | 复用相同的 lane-aware FIFO 逻辑，新增优先级/DLQ |
+| `src/agents/session-write-lock.ts`                         | `InProcessLockBackend.acquire`                       | 内存锁，与文件锁语义一致                        |
+| `src/config/types.secrets.ts` → `SecretRef`                | `SecretRefBackend.getSecret`                         | 内部调用 `resolveSecretRefValues`               |
+| `src/infra/outbound/delivery-queue.ts`                     | `FileSystemQueueBackend.enqueue`                     | 保留磁盘持久化语义                              |
+| 散落的 EventEmitter 使用                                   | `InProcessEventBus.subscribe`                        | 新的企业事件走 EventBus                         |
 
 ---
 
@@ -1127,9 +1133,7 @@ import type { TenantContext } from "../../kernel/tenant-context.ts";
  *
  * 链路：AuthN → TenantContext → AuthZ → RateLimit → [Handler] → ContentFilter → Audit
  */
-export function createEnterpriseMiddlewareChain(
-  modules: EnterpriseModules,
-): Hono {
+export function createEnterpriseMiddlewareChain(modules: EnterpriseModules): Hono {
   const app = new Hono();
 
   // 1. 认证中间件
@@ -1168,9 +1172,7 @@ import type { MiddlewareHandler } from "hono";
  * - 认证失败：返回 401
  * - 未配置企业认证时：使用 TokenIdentityProvider（兼容现有 token/password 认证）
  */
-export function createAuthnMiddleware(
-  modules: EnterpriseModules,
-): MiddlewareHandler {
+export function createAuthnMiddleware(modules: EnterpriseModules): MiddlewareHandler {
   return async (c, next) => {
     const provider = modules.governance?.identityProvider;
 
@@ -1210,9 +1212,7 @@ import type { MiddlewareHandler } from "hono";
  * 在响应发出后异步记录审计事件，不阻塞业务请求。
  * 使用 Hono 的 after-response hook。
  */
-export function createAuditMiddleware(
-  modules: EnterpriseModules,
-): MiddlewareHandler {
+export function createAuditMiddleware(modules: EnterpriseModules): MiddlewareHandler {
   return async (c, next) => {
     const startTime = Date.now();
     const requestId = c.get("tenantContext")?.requestId ?? crypto.randomUUID();
@@ -1344,9 +1344,7 @@ export class AuditPipelineEngine implements AuditPipeline {
 export class TokenIdentityProvider implements IdentityProvider {
   readonly type = "token";
 
-  constructor(
-    private authConfig: ResolvedGatewayAuth,
-  ) {}
+  constructor(private authConfig: ResolvedGatewayAuth) {}
 
   async initialize(): Promise<void> {}
   async shutdown(): Promise<void> {}
@@ -1448,7 +1446,7 @@ export class IllegalStateTransitionError extends Error {
   ) {
     super(
       `Illegal state transition: cannot handle event "${event}" in state "${from}". ` +
-      `Available events: [${availableTransitions.join(", ")}]`,
+        `Available events: [${availableTransitions.join(", ")}]`,
     );
     this.name = "IllegalStateTransitionError";
   }
@@ -1475,7 +1473,10 @@ export class StateMachine<S extends string, E extends string> {
   private _currentState: S;
   private _history: Array<{ from: S; to: S; event: E; timestamp: Date }> = [];
 
-  constructor(private definition: StateMachineDefinition<S, E>, snapshot?: StateMachineSnapshot<S>) {
+  constructor(
+    private definition: StateMachineDefinition<S, E>,
+    snapshot?: StateMachineSnapshot<S>,
+  ) {
     this._currentState = snapshot?.currentState ?? definition.initialState;
     if (snapshot?.history) {
       this._history = snapshot.history.map((h) => ({
@@ -1573,34 +1574,49 @@ export class StateMachine<S extends string, E extends string> {
 import { StateMachine, type StateMachineDefinition } from "./state-machine.ts";
 
 export type TaskState =
-  | "pending" | "queued" | "running" | "paused"
-  | "completed" | "failed" | "killed" | "timeout";
+  | "pending"
+  | "queued"
+  | "running"
+  | "paused"
+  | "completed"
+  | "failed"
+  | "killed"
+  | "timeout";
 
 export type TaskEvent =
-  | "enqueue" | "start" | "complete" | "fail" | "pause"
-  | "resume" | "kill" | "timeout_trigger" | "retry";
+  | "enqueue"
+  | "start"
+  | "complete"
+  | "fail"
+  | "pause"
+  | "resume"
+  | "kill"
+  | "timeout_trigger"
+  | "retry";
 
 export const TASK_FSM_DEFINITION: StateMachineDefinition<TaskState, TaskEvent> = {
   initialState: "pending",
   terminalStates: ["completed", "killed"],
   transitions: [
-    { from: "pending",   event: "enqueue",          to: "queued" },
-    { from: "pending",   event: "kill",             to: "killed" },
-    { from: "queued",    event: "start",            to: "running" },
-    { from: "queued",    event: "kill",             to: "killed" },
-    { from: "running",   event: "complete",         to: "completed" },
-    { from: "running",   event: "fail",             to: "failed" },
-    { from: "running",   event: "pause",            to: "paused" },
-    { from: "running",   event: "kill",             to: "killed" },
-    { from: "running",   event: "timeout_trigger",  to: "timeout" },
-    { from: "paused",    event: "resume",           to: "running" },
-    { from: "paused",    event: "kill",             to: "killed" },
-    { from: "failed",    event: "retry",            to: "queued" },
-    { from: "timeout",   event: "retry",            to: "queued" },
+    { from: "pending", event: "enqueue", to: "queued" },
+    { from: "pending", event: "kill", to: "killed" },
+    { from: "queued", event: "start", to: "running" },
+    { from: "queued", event: "kill", to: "killed" },
+    { from: "running", event: "complete", to: "completed" },
+    { from: "running", event: "fail", to: "failed" },
+    { from: "running", event: "pause", to: "paused" },
+    { from: "running", event: "kill", to: "killed" },
+    { from: "running", event: "timeout_trigger", to: "timeout" },
+    { from: "paused", event: "resume", to: "running" },
+    { from: "paused", event: "kill", to: "killed" },
+    { from: "failed", event: "retry", to: "queued" },
+    { from: "timeout", event: "retry", to: "queued" },
   ],
 };
 
-export function createTaskFSM(snapshot?: StateMachineSnapshot<TaskState>): StateMachine<TaskState, TaskEvent> {
+export function createTaskFSM(
+  snapshot?: StateMachineSnapshot<TaskState>,
+): StateMachine<TaskState, TaskEvent> {
   return new StateMachine(TASK_FSM_DEFINITION, snapshot);
 }
 ```
@@ -1644,7 +1660,9 @@ export function createCircuitBreaker(options: CircuitBreakerOptions): CircuitBre
     },
     execute: <T>(fn: () => Promise<T>) => circuitPolicy.execute(fn),
     reset: () => circuitPolicy.dispose(),
-    trip: () => { /* Cockatiel 不直接支持手动 trip，需自行记录 */ },
+    trip: () => {
+      /* Cockatiel 不直接支持手动 trip，需自行记录 */
+    },
     getMetrics: () => ({
       state: circuitPolicy.state as "closed" | "open" | "half-open",
       totalRequests: 0, // 需要自行统计
@@ -1708,20 +1726,28 @@ export function createGatewayHttpServer(state: GatewayRuntimeState) {
     if (state.enterprise && req.url?.startsWith("/api/v1/")) {
       const enterpriseApp = state.enterprise.embedding?.restApi;
       if (enterpriseApp) {
-        return enterpriseApp.fetch(
-          new Request(`http://localhost${req.url}`, {
-            method: req.method,
-            headers: Object.fromEntries(
-              Object.entries(req.headers).filter(([_, v]) => v != null) as [string, string][],
-            ),
-          }),
-        ).then((response) => {
-          res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
-          response.body?.pipeTo(new WritableStream({
-            write(chunk) { res.write(chunk); },
-            close() { res.end(); },
-          }));
-        });
+        return enterpriseApp
+          .fetch(
+            new Request(`http://localhost${req.url}`, {
+              method: req.method,
+              headers: Object.fromEntries(
+                Object.entries(req.headers).filter(([_, v]) => v != null) as [string, string][],
+              ),
+            }),
+          )
+          .then((response) => {
+            res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
+            response.body?.pipeTo(
+              new WritableStream({
+                write(chunk) {
+                  res.write(chunk);
+                },
+                close() {
+                  res.end();
+                },
+              }),
+            );
+          });
       }
     }
   });
@@ -1843,7 +1869,8 @@ export class PostgresStorageBackend implements StorageBackend {
 
   async get<T>(ctx: TenantContext, collection: string, key: string): Promise<T | null> {
     const row = await this.withTenant(ctx, (db) =>
-      db.selectFrom("enterprise_kv")
+      db
+        .selectFrom("enterprise_kv")
         .where("tenant_id", "=", ctx.tenantId)
         .where("collection", "=", collection)
         .where("key", "=", key)
@@ -1855,7 +1882,8 @@ export class PostgresStorageBackend implements StorageBackend {
 
   async set<T>(ctx: TenantContext, collection: string, key: string, value: T): Promise<void> {
     await this.withTenant(ctx, (db) =>
-      db.insertInto("enterprise_kv")
+      db
+        .insertInto("enterprise_kv")
         .values({
           tenant_id: ctx.tenantId,
           collection,
@@ -1881,7 +1909,10 @@ export class PostgresStorageBackend implements StorageBackend {
     });
   }
 
-  private async withTenant<T>(ctx: TenantContext, fn: (db: Kysely<DatabaseSchema>) => Promise<T>): Promise<T> {
+  private async withTenant<T>(
+    ctx: TenantContext,
+    fn: (db: Kysely<DatabaseSchema>) => Promise<T>,
+  ): Promise<T> {
     // 在连接级别设置 tenant_id（RLS 使用）
     await this.db!.raw(`SET LOCAL openclaw.tenant_id = '${ctx.tenantId}'`);
     return fn(this.db!);
@@ -1965,11 +1996,7 @@ export class RedisQueueBackend implements QueueBackend {
     return job.id!;
   }
 
-  subscribe(
-    queue: string,
-    handler: QueueHandler,
-    options?: SubscribeOptions,
-  ): QueueSubscription {
+  subscribe(queue: string, handler: QueueHandler, options?: SubscribeOptions): QueueSubscription {
     const worker = new Worker(
       queue,
       async (job) => {
@@ -2214,10 +2241,7 @@ export class RbacPolicyEngine implements PolicyEngine {
   async authorize(request: AuthzRequest): Promise<AuthzDecision> {
     const ability = this.getOrBuildAbility(request.subject);
 
-    const allowed = ability.can(
-      request.action,
-      request.resource.type,
-    );
+    const allowed = ability.can(request.action, request.resource.type);
 
     if (!allowed) {
       return { allowed: false, reason: "RBAC policy denied" };
@@ -2248,8 +2272,8 @@ export class RbacPolicyEngine implements PolicyEngine {
 
     for (const policy of this.policies) {
       for (const rule of policy.rules) {
-        const matchesSubject = rule.subjects.some((s) =>
-          subject.roles.includes(s) || subject.groups.includes(s) || s === "*",
+        const matchesSubject = rule.subjects.some(
+          (s) => subject.roles.includes(s) || subject.groups.includes(s) || s === "*",
         );
         if (!matchesSubject) continue;
 
@@ -2315,9 +2339,10 @@ export function buildRestApi(
 
     api.on(route.method, route.path, async (c) => {
       const ctx = c.get("tenantContext");
-      const params = route.method === "GET"
-        ? Object.fromEntries(new URL(c.req.url).searchParams)
-        : await c.req.json();
+      const params =
+        route.method === "GET"
+          ? Object.fromEntries(new URL(c.req.url).searchParams)
+          : await c.req.json();
 
       const result = await handler({
         ...params,
@@ -2339,13 +2364,13 @@ export function buildRestApi(
 
 function mapMethodToRoute(methodName: string): { method: string; path: string } | null {
   const mappings: Record<string, { method: string; path: string }> = {
-    "sessions.send":    { method: "POST", path: "/api/v1/sessions/:key/send" },
-    "sessions.list":    { method: "GET",  path: "/api/v1/sessions" },
-    "sessions.history": { method: "GET",  path: "/api/v1/sessions/:key/history" },
-    "config.get":       { method: "GET",  path: "/api/v1/config" },
-    "config.set":       { method: "PUT",  path: "/api/v1/config" },
-    "channels.status":  { method: "GET",  path: "/api/v1/channels/status" },
-    "agents.list":      { method: "GET",  path: "/api/v1/agents" },
+    "sessions.send": { method: "POST", path: "/api/v1/sessions/:key/send" },
+    "sessions.list": { method: "GET", path: "/api/v1/sessions" },
+    "sessions.history": { method: "GET", path: "/api/v1/sessions/:key/history" },
+    "config.get": { method: "GET", path: "/api/v1/config" },
+    "config.set": { method: "PUT", path: "/api/v1/config" },
+    "channels.status": { method: "GET", path: "/api/v1/channels/status" },
+    "agents.list": { method: "GET", path: "/api/v1/agents" },
   };
   return mappings[methodName] ?? null;
 }
@@ -2583,7 +2608,9 @@ export class SimpleWorkflowEngine implements WorkflowEngine {
 
   async signal(ctx: TenantContext, instanceId: string, signal: WorkflowSignal): Promise<void> {
     const instance = await this.storage.get<WorkflowInstance>(
-      ctx, "workflow_instances", instanceId,
+      ctx,
+      "workflow_instances",
+      instanceId,
     );
     if (!instance) throw new Error(`Workflow instance not found: ${instanceId}`);
 
@@ -2645,12 +2672,12 @@ export class SimpleWorkflowEngine implements WorkflowEngine {
 
 ### 7.1 测试分层
 
-| 层级 | 范围 | 框架 | 运行方式 |
-|------|------|------|----------|
-| **单元测试** | 每个内核接口的每个实现 | Vitest | `pnpm test -- src/enterprise/**/*.test.ts` |
-| **合规测试** | 接口契约验证（所有实现必须通过同一套测试） | Vitest | 参数化测试，每个后端实现作为参数 |
-| **集成测试** | 多模块协作（中间件链、审计管道、Task FSM + Queue） | Vitest | 使用 Memory 后端，不需要外部服务 |
-| **E2E 测试** | PG/Redis 后端的真实环境测试 | Vitest + Docker Compose | `pnpm test:enterprise:e2e` |
+| 层级         | 范围                                               | 框架                    | 运行方式                                   |
+| ------------ | -------------------------------------------------- | ----------------------- | ------------------------------------------ |
+| **单元测试** | 每个内核接口的每个实现                             | Vitest                  | `pnpm test -- src/enterprise/**/*.test.ts` |
+| **合规测试** | 接口契约验证（所有实现必须通过同一套测试）         | Vitest                  | 参数化测试，每个后端实现作为参数           |
+| **集成测试** | 多模块协作（中间件链、审计管道、Task FSM + Queue） | Vitest                  | 使用 Memory 后端，不需要外部服务           |
+| **E2E 测试** | PG/Redis 后端的真实环境测试                        | Vitest + Docker Compose | `pnpm test:enterprise:e2e`                 |
 
 ### 7.2 合规测试模式（关键设计）
 
@@ -2772,8 +2799,8 @@ services:
   openclaw:
     image: openclaw/enterprise:latest
     ports:
-      - "18789:18789"   # Gateway
-      - "9090:9090"     # Prometheus metrics
+      - "18789:18789" # Gateway
+      - "9090:9090" # Prometheus metrics
     environment:
       - OPENCLAW_ENTERPRISE_ENABLED=true
       - DATABASE_URL=postgres://openclaw:openclaw@postgres:5432/openclaw
@@ -2859,16 +2886,16 @@ openclaw gateway run
 
 ## 九、风险与缓解
 
-| 风险 | 影响 | 概率 | 缓解措施 |
-|------|------|------|----------|
-| **Phase 0 性能退化** | 现有用户体验下降 | 低 | Memory 后端的 Map 操作是 O(1)，不会比直接文件操作慢。Phase 0 增加性能基准测试，CI 门控。 |
-| **FileSystem 桥接行为不一致** | 个人版升级后出现 bug | 中 | 合规测试强制覆盖所有 CRUD 路径。Phase 0 结束前全量回归。 |
-| **BullMQ Redis 版本兼容性** | Redis 后端启动失败 | 低 | BullMQ 支持 Redis 6+/Valkey/ElastiCache，覆盖面广。文档中标注最低版本。 |
-| **Hono 与现有 HTTP 层冲突** | 企业 REST API 路由和现有路由冲突 | 中 | 企业 API 统一使用 `/api/v1/` 前缀，与现有路由命名空间隔离。Hono 作为子路由挂载，不替换现有 HTTP server。 |
-| **CASL 规则序列化不完整** | RBAC 策略热加载丢失条件 | 中 | CASL 的 conditions 使用 MongoDB 查询语法，JSON 可序列化。在合规测试中覆盖序列化/反序列化往返。 |
-| **Cockatiel 维护者风险** | 长期无更新 | 低 | Cockatiel 零依赖，代码量小（~2000 行）。最坏情况可 fork 维护，或用 30 行代码自研熔断器。 |
-| **多 Agent 并发修改企业配置** | 配置竞态 | 中 | 企业配置写入走 LockBackend.acquire，PG 后端走事务。Memory 后端单进程无竞态。 |
-| **K8s Runtime Pod 泄漏** | 僵尸 Pod 占用集群资源 | 中 | Pod 设置 `activeDeadlineSeconds`；HealthAggregator 周期检查并清理超时 Pod；K8s Job TTL 控制器作为兜底。 |
+| 风险                          | 影响                             | 概率 | 缓解措施                                                                                                 |
+| ----------------------------- | -------------------------------- | ---- | -------------------------------------------------------------------------------------------------------- |
+| **Phase 0 性能退化**          | 现有用户体验下降                 | 低   | Memory 后端的 Map 操作是 O(1)，不会比直接文件操作慢。Phase 0 增加性能基准测试，CI 门控。                 |
+| **FileSystem 桥接行为不一致** | 个人版升级后出现 bug             | 中   | 合规测试强制覆盖所有 CRUD 路径。Phase 0 结束前全量回归。                                                 |
+| **BullMQ Redis 版本兼容性**   | Redis 后端启动失败               | 低   | BullMQ 支持 Redis 6+/Valkey/ElastiCache，覆盖面广。文档中标注最低版本。                                  |
+| **Hono 与现有 HTTP 层冲突**   | 企业 REST API 路由和现有路由冲突 | 中   | 企业 API 统一使用 `/api/v1/` 前缀，与现有路由命名空间隔离。Hono 作为子路由挂载，不替换现有 HTTP server。 |
+| **CASL 规则序列化不完整**     | RBAC 策略热加载丢失条件          | 中   | CASL 的 conditions 使用 MongoDB 查询语法，JSON 可序列化。在合规测试中覆盖序列化/反序列化往返。           |
+| **Cockatiel 维护者风险**      | 长期无更新                       | 低   | Cockatiel 零依赖，代码量小（~2000 行）。最坏情况可 fork 维护，或用 30 行代码自研熔断器。                 |
+| **多 Agent 并发修改企业配置** | 配置竞态                         | 中   | 企业配置写入走 LockBackend.acquire，PG 后端走事务。Memory 后端单进程无竞态。                             |
+| **K8s Runtime Pod 泄漏**      | 僵尸 Pod 占用集群资源            | 中   | Pod 设置 `activeDeadlineSeconds`；HealthAggregator 周期检查并清理超时 Pod；K8s Job TTL 控制器作为兜底。  |
 
 ---
 
@@ -2942,69 +2969,111 @@ import { Type, type Static } from "@sinclair/typebox";
 export const EnterpriseConfigSchema = Type.Object({
   enabled: Type.Boolean({ default: false }),
 
-  kernel: Type.Optional(Type.Object({
-    storage: Type.Optional(Type.Object({
-      backend: Type.Optional(Type.String({ default: "memory" })),
-      postgres: Type.Optional(Type.Object({
-        connectionString: Type.Union([Type.String(), SecretRefSchema]),
-        pool: Type.Optional(Type.Object({
-          min: Type.Optional(Type.Number({ default: 2 })),
-          max: Type.Optional(Type.Number({ default: 10 })),
-        })),
-      })),
-    })),
-    queue: Type.Optional(Type.Object({
-      backend: Type.Optional(Type.String({ default: "memory" })),
-      redis: Type.Optional(Type.Object({
-        url: Type.Union([Type.String(), SecretRefSchema]),
-      })),
-    })),
-    cache: Type.Optional(Type.Object({
-      backend: Type.Optional(Type.String({ default: "memory" })),
-    })),
-    secret: Type.Optional(Type.Object({
-      backend: Type.Optional(Type.String({ default: "secret-ref" })),
-    })),
-    eventBus: Type.Optional(Type.Object({
-      backend: Type.Optional(Type.String({ default: "inprocess" })),
-    })),
-    lock: Type.Optional(Type.Object({
-      backend: Type.Optional(Type.String({ default: "inprocess" })),
-    })),
-  })),
+  kernel: Type.Optional(
+    Type.Object({
+      storage: Type.Optional(
+        Type.Object({
+          backend: Type.Optional(Type.String({ default: "memory" })),
+          postgres: Type.Optional(
+            Type.Object({
+              connectionString: Type.Union([Type.String(), SecretRefSchema]),
+              pool: Type.Optional(
+                Type.Object({
+                  min: Type.Optional(Type.Number({ default: 2 })),
+                  max: Type.Optional(Type.Number({ default: 10 })),
+                }),
+              ),
+            }),
+          ),
+        }),
+      ),
+      queue: Type.Optional(
+        Type.Object({
+          backend: Type.Optional(Type.String({ default: "memory" })),
+          redis: Type.Optional(
+            Type.Object({
+              url: Type.Union([Type.String(), SecretRefSchema]),
+            }),
+          ),
+        }),
+      ),
+      cache: Type.Optional(
+        Type.Object({
+          backend: Type.Optional(Type.String({ default: "memory" })),
+        }),
+      ),
+      secret: Type.Optional(
+        Type.Object({
+          backend: Type.Optional(Type.String({ default: "secret-ref" })),
+        }),
+      ),
+      eventBus: Type.Optional(
+        Type.Object({
+          backend: Type.Optional(Type.String({ default: "inprocess" })),
+        }),
+      ),
+      lock: Type.Optional(
+        Type.Object({
+          backend: Type.Optional(Type.String({ default: "inprocess" })),
+        }),
+      ),
+    }),
+  ),
 
-  governance: Type.Optional(Type.Object({
-    identity: Type.Optional(Type.Object({
-      provider: Type.Optional(Type.String({ default: "token" })),
-    })),
-    authorization: Type.Optional(Type.Object({
-      engine: Type.Optional(Type.String({ default: "scope" })),
-    })),
-  })),
+  governance: Type.Optional(
+    Type.Object({
+      identity: Type.Optional(
+        Type.Object({
+          provider: Type.Optional(Type.String({ default: "token" })),
+        }),
+      ),
+      authorization: Type.Optional(
+        Type.Object({
+          engine: Type.Optional(Type.String({ default: "scope" })),
+        }),
+      ),
+    }),
+  ),
 
-  audit: Type.Optional(Type.Object({
-    sinks: Type.Optional(Type.Array(Type.Object({
-      type: Type.String(),
-    }))),
-  })),
+  audit: Type.Optional(
+    Type.Object({
+      sinks: Type.Optional(
+        Type.Array(
+          Type.Object({
+            type: Type.String(),
+          }),
+        ),
+      ),
+    }),
+  ),
 
-  reliability: Type.Optional(Type.Object({
-    retry: Type.Optional(Type.Object({
-      defaultPolicy: Type.Optional(Type.Object({
-        maxAttempts: Type.Optional(Type.Number({ default: 3 })),
-        baseDelayMs: Type.Optional(Type.Number({ default: 500 })),
-        maxDelayMs: Type.Optional(Type.Number({ default: 30000 })),
-      })),
-    })),
-    circuitBreaker: Type.Optional(Type.Object({
-      failureThreshold: Type.Optional(Type.Number({ default: 5 })),
-      resetTimeoutMs: Type.Optional(Type.Number({ default: 30000 })),
-    })),
-    metrics: Type.Optional(Type.Object({
-      provider: Type.Optional(Type.String({ default: "noop" })),
-      port: Type.Optional(Type.Number({ default: 9090 })),
-    })),
-  })),
+  reliability: Type.Optional(
+    Type.Object({
+      retry: Type.Optional(
+        Type.Object({
+          defaultPolicy: Type.Optional(
+            Type.Object({
+              maxAttempts: Type.Optional(Type.Number({ default: 3 })),
+              baseDelayMs: Type.Optional(Type.Number({ default: 500 })),
+              maxDelayMs: Type.Optional(Type.Number({ default: 30000 })),
+            }),
+          ),
+        }),
+      ),
+      circuitBreaker: Type.Optional(
+        Type.Object({
+          failureThreshold: Type.Optional(Type.Number({ default: 5 })),
+          resetTimeoutMs: Type.Optional(Type.Number({ default: 30000 })),
+        }),
+      ),
+      metrics: Type.Optional(
+        Type.Object({
+          provider: Type.Optional(Type.String({ default: "noop" })),
+          port: Type.Optional(Type.Number({ default: 9090 })),
+        }),
+      ),
+    }),
+  ),
 });
 
 export type EnterpriseConfig = Static<typeof EnterpriseConfigSchema>;

@@ -7,20 +7,19 @@
  * behavior with zero external dependencies.
  */
 
-import type { StorageBackend } from "./storage.ts";
-import type { QueueBackend } from "./queue.ts";
-import type { CacheBackend } from "./cache.ts";
-import type { SecretBackend } from "./secret.ts";
-import type { EventBus } from "./event-bus.ts";
-import type { LockBackend } from "./lock.ts";
-import type { EnterpriseConfig } from "./config.ts";
-
-import { MemoryStorageBackend } from "../kernel-impl/memory/storage.ts";
-import { MemoryQueueBackend } from "../kernel-impl/memory/queue.ts";
 import { MemoryCacheBackend } from "../kernel-impl/memory/cache.ts";
-import { EnvSecretBackend } from "../kernel-impl/memory/secret.ts";
 import { InProcessEventBus } from "../kernel-impl/memory/event-bus.ts";
 import { InProcessLockBackend } from "../kernel-impl/memory/lock.ts";
+import { MemoryQueueBackend } from "../kernel-impl/memory/queue.ts";
+import { EnvSecretBackend } from "../kernel-impl/memory/secret.ts";
+import { MemoryStorageBackend } from "../kernel-impl/memory/storage.ts";
+import type { CacheBackend } from "./cache.ts";
+import type { EnterpriseConfig } from "./config.ts";
+import type { EventBus } from "./event-bus.ts";
+import type { LockBackend } from "./lock.ts";
+import type { QueueBackend } from "./queue.ts";
+import type { SecretBackend } from "./secret.ts";
+import type { StorageBackend } from "./storage.ts";
 
 /**
  * Holds references to all active kernel backends.
@@ -94,7 +93,7 @@ async function resolveQueueBackend(config: EnterpriseConfig): Promise<QueueBacke
   switch (selector?.backend) {
     case "redis": {
       const { RedisQueueBackend } = await import("../kernel-impl/redis/queue.ts");
-      return new RedisQueueBackend({ url: selector["url"] as string ?? "" });
+      return new RedisQueueBackend({ url: (selector["url"] as string) ?? "" });
     }
     default:
       return new MemoryQueueBackend();
@@ -106,7 +105,7 @@ async function resolveCacheBackend(config: EnterpriseConfig): Promise<CacheBacke
   switch (selector?.backend) {
     case "redis": {
       const { RedisCacheBackend } = await import("../kernel-impl/redis/cache.ts");
-      return new RedisCacheBackend({ url: selector["url"] as string ?? "" });
+      return new RedisCacheBackend({ url: (selector["url"] as string) ?? "" });
     }
     default:
       return new MemoryCacheBackend();
@@ -123,7 +122,7 @@ async function resolveEventBus(config: EnterpriseConfig): Promise<EventBus> {
   switch (selector?.backend) {
     case "redis": {
       const { RedisEventBus } = await import("../kernel-impl/redis/event-bus.ts");
-      return new RedisEventBus({ url: selector["url"] as string ?? "" });
+      return new RedisEventBus({ url: (selector["url"] as string) ?? "" });
     }
     default:
       return new InProcessEventBus();
@@ -135,7 +134,7 @@ async function resolveLockBackend(config: EnterpriseConfig): Promise<LockBackend
   switch (selector?.backend) {
     case "redis": {
       const { RedisLockBackend } = await import("../kernel-impl/redis/lock.ts");
-      return new RedisLockBackend({ url: selector["url"] as string ?? "" });
+      return new RedisLockBackend({ url: (selector["url"] as string) ?? "" });
     }
     default:
       return new InProcessLockBackend();

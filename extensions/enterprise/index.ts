@@ -5,14 +5,14 @@
  * Uses:
  *   - registerService: lifecycle (bootstrap on start, teardown on stop)
  *   - registerHttpRoute: mount enterprise REST API at /api/v1/*
+ *   - onConversationBindingResolved: audit trail for binding decisions
+ *   - registerCommand: /enterprise chat commands for operators
  */
 
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import {
-  bootstrapEnterprise,
-  shutdownEnterprise,
-  getEnterpriseModules,
-} from "./bootstrap.ts";
+import { bootstrapEnterprise, shutdownEnterprise, getEnterpriseModules } from "./bootstrap.ts";
+import { registerBindingAuditHandler } from "./src/audit/binding-audit.ts";
+import { registerEnterpriseCommands } from "./src/commands/enterprise-commands.ts";
 import { buildRestApi } from "./src/embedding/api/rest-api-builder.ts";
 
 export default definePluginEntry({
@@ -26,10 +26,9 @@ export default definePluginEntry({
       id: "enterprise",
 
       async start(ctx) {
-        const enterpriseConfig =
-          (ctx.config as Record<string, unknown>)["enterprise"] as
-            | Record<string, unknown>
-            | undefined;
+        const enterpriseConfig = (ctx.config as Record<string, unknown>)["enterprise"] as
+          | Record<string, unknown>
+          | undefined;
 
         if (!enterpriseConfig?.["enabled"]) {
           ctx.logger.info("Enterprise mode disabled — skipping bootstrap");
@@ -73,13 +72,10 @@ export default definePluginEntry({
         const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
         const honoReq = new Request(url.toString(), {
           method: req.method,
-          headers: Object.entries(req.headers).reduce(
-            (h, [k, v]) => {
-              if (v) h.set(k, Array.isArray(v) ? v.join(", ") : v);
-              return h;
-            },
-            new Headers(),
-          ),
+          headers: Object.entries(req.headers).reduce((h, [k, v]) => {
+            if (v) h.set(k, Array.isArray(v) ? v.join(", ") : v);
+            return h;
+          }, new Headers()),
         });
 
         const honoRes = await honoApp.fetch(honoReq);
@@ -89,5 +85,8 @@ export default definePluginEntry({
         return true;
       },
     });
+
+    registerBindingAuditHandler(api);
+    registerEnterpriseCommands(api);
   },
 });

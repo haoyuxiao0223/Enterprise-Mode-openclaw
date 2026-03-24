@@ -5,8 +5,8 @@
  * Leader election via periodic lock renewal.
  */
 
-import Redlock from "redlock-universal";
 import type IORedis from "ioredis";
+import Redlock from "redlock-universal";
 import type {
   LockBackend,
   LockOptions,
@@ -84,11 +84,7 @@ export class RedisLockBackend implements LockBackend {
     }
   }
 
-  electLeader(
-    group: string,
-    candidateId: string,
-    options: LeaderElectionOptions,
-  ): LeaderElection {
+  electLeader(group: string, candidateId: string, options: LeaderElectionOptions): LeaderElection {
     let isLeaderFlag = false;
     let onElectedCb: (() => void) | null = null;
     let onDeposedCb: (() => void) | null = null;
@@ -137,8 +133,12 @@ export class RedisLockBackend implements LockBackend {
 
     return {
       isLeader: () => isLeaderFlag,
-      onElected: (handler) => { onElectedCb = handler; },
-      onDeposed: (handler) => { onDeposedCb = handler; },
+      onElected: (handler) => {
+        onElectedCb = handler;
+      },
+      onDeposed: (handler) => {
+        onDeposedCb = handler;
+      },
       resign: async () => {
         clearInterval(interval);
         this.leaderIntervals.delete(`${group}:${candidateId}`);

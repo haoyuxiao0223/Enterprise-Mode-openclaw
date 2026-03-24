@@ -13,9 +13,13 @@ import { sql } from "kysely";
 import type { StorageBackend, StorageTransaction } from "../../kernel/storage.ts";
 import type { TenantContext } from "../../kernel/tenant-context.ts";
 import type { HealthStatus, PaginatedResult, StorageQuery } from "../../kernel/types.ts";
-import type { DatabaseSchema } from "./schema-types.ts";
-import { createKyselyInstance, withTenantScope, type PostgresConnectionConfig } from "./connection.ts";
+import {
+  createKyselyInstance,
+  withTenantScope,
+  type PostgresConnectionConfig,
+} from "./connection.ts";
 import { runMigrations } from "./migrations/runner.ts";
+import type { DatabaseSchema } from "./schema-types.ts";
 
 export class PostgresStorageBackend implements StorageBackend {
   private db: Kysely<DatabaseSchema> | null = null;
@@ -97,7 +101,11 @@ export class PostgresStorageBackend implements StorageBackend {
     });
   }
 
-  async list<T>(ctx: TenantContext, collection: string, query: StorageQuery): Promise<PaginatedResult<T>> {
+  async list<T>(
+    ctx: TenantContext,
+    collection: string,
+    query: StorageQuery,
+  ): Promise<PaginatedResult<T>> {
     return withTenantScope(this.requireDb(), ctx, async (db) => {
       let qb = db
         .selectFrom("enterprise_kv")
@@ -108,12 +116,17 @@ export class PostgresStorageBackend implements StorageBackend {
         qb = qb.where("key", "like", `${query.prefix}%`);
       }
 
-      const countResult = await qb.select(sql<number>`count(*)::int`.as("count")).executeTakeFirst();
+      const countResult = await qb
+        .select(sql<number>`count(*)::int`.as("count"))
+        .executeTakeFirst();
       const total = countResult?.count ?? 0;
 
       let dataQb = qb.select(["key", "value"]);
       if (query.orderBy) {
-        dataQb = dataQb.orderBy(query.orderBy === "key" ? "key" : "created_at", query.order ?? "asc");
+        dataQb = dataQb.orderBy(
+          query.orderBy === "key" ? "key" : "created_at",
+          query.order ?? "asc",
+        );
       }
 
       const offset = query.offset ?? 0;
@@ -166,7 +179,11 @@ export class PostgresStorageBackend implements StorageBackend {
     });
   }
 
-  async batchGet<T>(ctx: TenantContext, collection: string, keys: string[]): Promise<Map<string, T>> {
+  async batchGet<T>(
+    ctx: TenantContext,
+    collection: string,
+    keys: string[],
+  ): Promise<Map<string, T>> {
     if (keys.length === 0) return new Map();
 
     return withTenantScope(this.requireDb(), ctx, async (db) => {
@@ -215,11 +232,16 @@ export class PostgresStorageBackend implements StorageBackend {
   }
 
   async transaction<T>(ctx: TenantContext, fn: (tx: StorageTransaction) => Promise<T>): Promise<T> {
-    return this.requireDb().transaction().execute(async (trx) => {
-      await sql`SELECT set_config('openclaw.tenant_id', ${ctx.tenantId}, true)`.execute(trx);
-      const stx = new PostgresStorageTransaction(trx as unknown as Kysely<DatabaseSchema>, ctx.tenantId);
-      return fn(stx);
-    });
+    return this.requireDb()
+      .transaction()
+      .execute(async (trx) => {
+        await sql`SELECT set_config('openclaw.tenant_id', ${ctx.tenantId}, true)`.execute(trx);
+        const stx = new PostgresStorageTransaction(
+          trx as unknown as Kysely<DatabaseSchema>,
+          ctx.tenantId,
+        );
+        return fn(stx);
+      });
   }
 
   private requireDb(): Kysely<DatabaseSchema> {

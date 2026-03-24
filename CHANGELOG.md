@@ -51,6 +51,9 @@ Docs: https://docs.openclaw.ai
 - Web tools/Tavily: add Tavily as a bundled web-search provider with dedicated `tavily_search` and `tavily_extract` tools, using canonical plugin-owned config under `plugins.entries.tavily.config.webSearch.*`. (#49200) thanks @lakshyaag-tavily.
 - Docs/plugins: add the community DingTalk plugin listing to the docs catalog. (#29913) Thanks @sliverp.
 - Docs/plugins: add the community QQbot plugin listing to the docs catalog. (#29898) Thanks @sliverp.
+- Enterprise/plugin: align enterprise extension to openclaw 2026.3.23 — bump version, narrow `peerDependencies` to `>=2026.3.23`, and fix `redlock-universal` dependency version.
+- Enterprise/audit: add conversation binding audit trail via `onConversationBindingResolved`, emitting structured `AuditEvent` records for every binding approval or denial.
+- Enterprise/commands: add `/enterprise` chat command with `status`, `audit`, `health`, and `help` subcommands for operator-facing diagnostics via `registerCommand`.
 
 ### Fixes
 

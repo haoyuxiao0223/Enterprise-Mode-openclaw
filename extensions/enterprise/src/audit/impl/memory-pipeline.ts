@@ -7,8 +7,8 @@
 import type { TenantContext } from "../../kernel/tenant-context.ts";
 import type { PaginatedResult } from "../../kernel/types.ts";
 import type { AuditEvent } from "../audit-event.ts";
-import type { AuditSink } from "../audit-sink.ts";
 import type { AuditPipeline, AuditQuery, AuditMetrics } from "../audit-pipeline.ts";
+import type { AuditSink } from "../audit-sink.ts";
 
 export class MemoryAuditPipeline implements AuditPipeline {
   private sinks: AuditSink[] = [];
@@ -17,7 +17,10 @@ export class MemoryAuditPipeline implements AuditPipeline {
   private flushInterval: ReturnType<typeof setInterval> | undefined;
   private allEvents: AuditEvent[] = [];
 
-  constructor(private flushIntervalMs = 1000, private batchSize = 100) {}
+  constructor(
+    private flushIntervalMs = 1000,
+    private batchSize = 100,
+  ) {}
 
   registerSink(sink: AuditSink): void {
     this.sinks.push(sink);
@@ -42,7 +45,8 @@ export class MemoryAuditPipeline implements AuditPipeline {
     if (query.action) filtered = filtered.filter((e) => e.action === query.action);
     if (query.actorId) filtered = filtered.filter((e) => e.actor.id === query.actorId);
     if (query.outcome) filtered = filtered.filter((e) => e.outcome === query.outcome);
-    if (query.resourceType) filtered = filtered.filter((e) => e.resource.type === query.resourceType);
+    if (query.resourceType)
+      filtered = filtered.filter((e) => e.resource.type === query.resourceType);
     if (query.requestId) filtered = filtered.filter((e) => e.source.requestId === query.requestId);
 
     filtered.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
@@ -79,8 +83,6 @@ export class MemoryAuditPipeline implements AuditPipeline {
     if (this.buffer.length === 0) return;
     const batch = this.buffer.splice(0);
 
-    await Promise.allSettled(
-      this.sinks.map((sink) => sink.writeBatch(batch)),
-    );
+    await Promise.allSettled(this.sinks.map((sink) => sink.writeBatch(batch)));
   }
 }

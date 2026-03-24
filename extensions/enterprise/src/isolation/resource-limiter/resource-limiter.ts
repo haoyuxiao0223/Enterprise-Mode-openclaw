@@ -11,7 +11,12 @@ export interface ResourceLimiter {
   setLimits(ctx: TenantContext, agentId: string, limits: ResourceLimits): Promise<void>;
   getLimits(ctx: TenantContext, agentId: string): Promise<ResourceLimits>;
   getCurrentUsage(ctx: TenantContext, agentId: string): Promise<ResourceUsage>;
-  checkLimit(ctx: TenantContext, agentId: string, resource: string, amount: number): Promise<ResourceCheckResult>;
+  checkLimit(
+    ctx: TenantContext,
+    agentId: string,
+    resource: string,
+    amount: number,
+  ): Promise<ResourceCheckResult>;
   enforce(ctx: TenantContext, agentId: string, resource: string, amount: number): Promise<void>;
 }
 

@@ -5,7 +5,6 @@
  * delayed scheduling. Single-process only.
  */
 
-import type { TenantContext } from "../../kernel/tenant-context.ts";
 import type {
   QueueBackend,
   QueueMessage,
@@ -16,6 +15,7 @@ import type {
   NackOptions,
   SubscribeOptions,
 } from "../../kernel/queue.ts";
+import type { TenantContext } from "../../kernel/tenant-context.ts";
 import type { HealthStatus, PaginatedResult } from "../../kernel/types.ts";
 
 const PRIORITY_ORDER: Record<string, number> = { high: 0, normal: 1, low: 2 };
@@ -118,11 +118,7 @@ export class MemoryQueueBackend implements QueueBackend {
     return this.toPublicMessage(msg);
   }
 
-  subscribe(
-    queue: string,
-    handler: QueueHandler,
-    _options?: SubscribeOptions,
-  ): QueueSubscription {
+  subscribe(queue: string, handler: QueueHandler, _options?: SubscribeOptions): QueueSubscription {
     let subs = this.subscriptions.get(queue);
     if (!subs) {
       subs = [];

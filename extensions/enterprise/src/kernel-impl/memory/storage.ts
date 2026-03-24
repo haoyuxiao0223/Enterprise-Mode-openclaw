@@ -5,8 +5,8 @@
  * Suitable for development, testing, and single-process personal-edition use.
  */
 
-import type { TenantContext } from "../../kernel/tenant-context.ts";
 import type { StorageBackend, StorageTransaction } from "../../kernel/storage.ts";
+import type { TenantContext } from "../../kernel/tenant-context.ts";
 import type { HealthStatus, PaginatedResult, StorageQuery } from "../../kernel/types.ts";
 
 type TenantStore = Map<string, Map<string, { value: unknown; createdAt: Date; updatedAt: Date }>>;
@@ -135,10 +135,7 @@ export class MemoryStorageBackend implements StorageBackend {
     }
   }
 
-  async transaction<T>(
-    ctx: TenantContext,
-    fn: (tx: StorageTransaction) => Promise<T>,
-  ): Promise<T> {
+  async transaction<T>(ctx: TenantContext, fn: (tx: StorageTransaction) => Promise<T>): Promise<T> {
     // Memory backend: transactions run inline (no real isolation needed)
     const self = this;
     const tx: StorageTransaction = {

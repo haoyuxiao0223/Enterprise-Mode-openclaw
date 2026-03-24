@@ -29,10 +29,7 @@
       "authorization": { "engine": "scope" }
     },
     "audit": {
-      "sinks": [
-        { "type": "log" },
-        { "type": "storage" }
-      ]
+      "sinks": [{ "type": "log" }, { "type": "storage" }]
     },
     "reliability": {
       "metrics": { "provider": "prometheus", "port": 9090 }

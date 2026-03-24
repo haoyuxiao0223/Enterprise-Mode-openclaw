@@ -58,15 +58,11 @@ export class StateMachine<S extends string, E extends string, C = unknown> {
   }
 
   canHandle(event: E): boolean {
-    return this._def.transitions.some(
-      (t) => t.from === this._state && t.event === event,
-    );
+    return this._def.transitions.some((t) => t.from === this._state && t.event === event);
   }
 
   availableEvents(): E[] {
-    return this._def.transitions
-      .filter((t) => t.from === this._state)
-      .map((t) => t.event);
+    return this._def.transitions.filter((t) => t.from === this._state).map((t) => t.event);
   }
 
   async send(event: E): Promise<S> {

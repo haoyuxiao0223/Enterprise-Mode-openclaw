@@ -5,10 +5,10 @@
  * Supports querying via the StorageBackend.list interface.
  */
 
-import type { AuditSink, AuditSinkCapabilities } from "../audit-sink.ts";
-import type { AuditEvent } from "../audit-event.ts";
 import type { StorageBackend } from "../../kernel/storage.ts";
 import { createDefaultTenantContext } from "../../kernel/tenant-context.ts";
+import type { AuditEvent } from "../audit-event.ts";
+import type { AuditSink, AuditSinkCapabilities } from "../audit-sink.ts";
 
 const COLLECTION = "audit_events";
 

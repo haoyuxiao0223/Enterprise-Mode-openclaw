@@ -43,9 +43,5 @@ export interface LockBackend extends BackendLifecycle {
   acquire(key: string, options: LockOptions): Promise<LockHandle | null>;
   release(handle: LockHandle): Promise<void>;
   extend(handle: LockHandle, extensionMs: number): Promise<boolean>;
-  electLeader(
-    group: string,
-    candidateId: string,
-    options: LeaderElectionOptions,
-  ): LeaderElection;
+  electLeader(group: string, candidateId: string, options: LeaderElectionOptions): LeaderElection;
 }

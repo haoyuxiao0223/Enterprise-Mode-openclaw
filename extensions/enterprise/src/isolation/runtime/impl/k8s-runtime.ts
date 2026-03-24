@@ -147,7 +147,9 @@ export class KubernetesRuntime implements AgentRuntimeBackend {
       agentId: pod.metadata?.labels?.["openclaw.ai/agent-id"] ?? "unknown",
       state: stateMap[phase] ?? "failed",
       spec: {} as RuntimeSpec,
-      createdAt: pod.metadata?.creationTimestamp ? new Date(pod.metadata.creationTimestamp) : new Date(),
+      createdAt: pod.metadata?.creationTimestamp
+        ? new Date(pod.metadata.creationTimestamp)
+        : new Date(),
       startedAt: pod.status?.startTime ? new Date(pod.status.startTime) : undefined,
     };
   }
@@ -161,10 +163,14 @@ export class KubernetesRuntime implements AgentRuntimeBackend {
     const egressRules: k8s.V1NetworkPolicyEgressRule[] = [];
 
     if (policy.mode === "allowlist") {
-      for (const rule of policy.rules.filter((r) => r.direction === "outbound" && r.action === "allow")) {
+      for (const rule of policy.rules.filter(
+        (r) => r.direction === "outbound" && r.action === "allow",
+      )) {
         egressRules.push({
           to: [{ ipBlock: { cidr: rule.host } }],
-          ports: rule.port ? [{ port: rule.port, protocol: (rule.protocol ?? "TCP").toUpperCase() }] : undefined,
+          ports: rule.port
+            ? [{ port: rule.port, protocol: (rule.protocol ?? "TCP").toUpperCase() }]
+            : undefined,
         });
       }
     }

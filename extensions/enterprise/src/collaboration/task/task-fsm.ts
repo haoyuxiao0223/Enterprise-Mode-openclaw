@@ -91,11 +91,7 @@ export class TaskFSM {
   transition(event: TaskEvent, actor: string, reason?: string): TaskState {
     const nextState = TRANSITION_TABLE[this._state]?.[event];
     if (nextState === undefined) {
-      throw new IllegalStateTransitionError(
-        this._state,
-        event,
-        this.availableEvents(),
-      );
+      throw new IllegalStateTransitionError(this._state, event, this.availableEvents());
     }
 
     const transition: TaskStateTransition = {

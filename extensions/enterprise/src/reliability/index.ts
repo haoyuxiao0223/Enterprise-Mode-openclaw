@@ -19,10 +19,7 @@ export type {
   Checkpoint,
 } from "./checkpoint/checkpoint-manager.ts";
 
-export type {
-  TimeoutManager,
-  TimeoutEntry,
-} from "./timeout/timeout-manager.ts";
+export type { TimeoutManager, TimeoutEntry } from "./timeout/timeout-manager.ts";
 
 export type {
   HealthChecker,
